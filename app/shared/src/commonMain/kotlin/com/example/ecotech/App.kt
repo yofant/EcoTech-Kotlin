@@ -21,7 +21,9 @@ fun App() {
             Screen.Welcome -> WelcomeScreen(
                 onContinue = { screen = Screen.Login },
             )
-            Screen.Login -> LoginScreen()
+            Screen.Login -> LoginScreen(
+                onBack = { screen = Screen.Welcome }
+            )
         }
     }
 }
