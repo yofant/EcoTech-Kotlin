@@ -11,6 +11,7 @@ import androidx.compose.ui.tooling.preview.Preview
 enum class Screen {
     Welcome,
     Login,
+    Register
 }
 
 @Composable
@@ -22,7 +23,11 @@ fun App() {
                 onContinue = { screen = Screen.Login },
             )
             Screen.Login -> LoginScreen(
-                onBack = { screen = Screen.Welcome }
+                onBack = { screen = Screen.Welcome },
+                onNavigateToRegister = { screen = Screen.Register }
+            )
+            Screen.Register -> RegisterScreen(
+                onBackToLogin = { screen = Screen.Login }
             )
         }
     }
