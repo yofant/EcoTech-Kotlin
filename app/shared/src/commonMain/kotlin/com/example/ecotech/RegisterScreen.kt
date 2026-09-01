@@ -8,9 +8,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -20,7 +27,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -32,24 +41,54 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+private val roles = listOf("Auditor", "Operador", "Tecnico", "Administrador")
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterScreen(onBackToLogin: () -> Unit) {
+fun RegisterScreen(onBackToLogin: () -> Unit, onRegisterSuccess: (UserResponse) -> Unit = {}) {
     var name by remember { mutableStateOf("") }
+    var lastName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
+    var phone by remember { mutableStateOf("") }
+    var role by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    var isLoading by remember { mutableStateOf(false) }
+    var roleExpanded by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
 
     fun validarFormulario() {
         errorMessage = when {
-            name.isBlank() || email.isBlank() || password.isBlank() || confirmPassword.isBlank() -> "Completa todos los campos"
+            name.isBlank() || lastName.isBlank() || email.isBlank() || phone.isBlank() ||
+                role.isBlank() || password.isBlank() || confirmPassword.isBlank() ->
+                "Completa todos los campos"
             !email.contains("@") -> "Ingresa un correo válido"
+            phone.length < 7 -> "Ingresa un teléfono válido"
+            role.isBlank() -> "Selecciona un rol"
             password.length < 6 -> "La contraseña debe tener al menos 6 caracteres"
             password != confirmPassword -> "Las contraseñas no coinciden"
             else -> null
         }
         if (errorMessage == null) {
-            // Aquí iría la lógica de registro
+            scope.launch {
+                isLoading = true
+                errorMessage = null
+                val result = AuthApi.register(
+                    name = name.trim(),
+                    lastName = lastName.trim(),
+                    email = email.trim(),
+                    phone = phone.trim(),
+                    role = role.trim(),
+                    password = password,
+                )
+                isLoading = false
+                if (result.success && result.user != null) {
+                    onRegisterSuccess(result.user)
+                } else {
+                    errorMessage = result.error
+                }
+            }
         }
     }
 
@@ -61,7 +100,8 @@ fun RegisterScreen(onBackToLogin: () -> Unit) {
                     colors = listOf(Color(0xFF1B5E20), Color(0xFF66BB6A))
                 )
             )
-            .padding(32.dp),
+            .padding(32.dp)
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
@@ -82,7 +122,17 @@ fun RegisterScreen(onBackToLogin: () -> Unit) {
         OutlinedTextField(
             value = name,
             onValueChange = { name = it },
-            label = { Text("Nombre completo") },
+            label = { Text("Nombre") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+            colors = textFieldColors()
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+
+        OutlinedTextField(
+            value = lastName,
+            onValueChange = { lastName = it },
+            label = { Text("Apellido") },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             colors = textFieldColors()
@@ -98,6 +148,51 @@ fun RegisterScreen(onBackToLogin: () -> Unit) {
             modifier = Modifier.fillMaxWidth(),
             colors = textFieldColors()
         )
+        Spacer(modifier = Modifier.height(16.dp))
+
+        OutlinedTextField(
+            value = phone,
+            onValueChange = { phone = it },
+            label = { Text("Teléfono") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+            colors = textFieldColors()
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+
+        ExposedDropdownMenuBox(
+            expanded = roleExpanded,
+            onExpandedChange = { roleExpanded = it },
+        ) {
+            OutlinedTextField(
+                value = role,
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Rol") },
+                placeholder = { Text("Selecciona tu rol") },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = roleExpanded) },
+                singleLine = true,
+                modifier = Modifier
+                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
+                    .fillMaxWidth(),
+                colors = textFieldColors()
+            )
+            ExposedDropdownMenu(
+                expanded = roleExpanded,
+                onDismissRequest = { roleExpanded = false },
+            ) {
+                roles.forEach { option ->
+                    DropdownMenuItem(
+                        text = { Text(option) },
+                        onClick = {
+                            role = option
+                            roleExpanded = false
+                        }
+                    )
+                }
+            }
+        }
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
@@ -129,6 +224,7 @@ fun RegisterScreen(onBackToLogin: () -> Unit) {
 
         Button(
             onClick = { validarFormulario() },
+            enabled = !isLoading,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
@@ -137,7 +233,10 @@ fun RegisterScreen(onBackToLogin: () -> Unit) {
                 contentColor = Color(0xFF1B5E20),
             ),
         ) {
-            Text(text = "Registrarse", fontSize = 18.sp)
+            Text(
+                text = if (isLoading) "Registrando..." else "Registrarse",
+                fontSize = 18.sp
+            )
         }
 
         Spacer(modifier = Modifier.height(16.dp))

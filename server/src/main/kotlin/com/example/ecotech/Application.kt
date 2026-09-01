@@ -17,6 +17,8 @@ fun main() {
 }
 
 fun Application.module() {
+    DatabaseFactory.init()
+
     install(ContentNegotiation) {
         json(Json {
             prettyPrint = true
@@ -38,8 +40,20 @@ fun Application.module() {
                         call.respond(HttpStatusCode.BadRequest, ErrorResponse("El nombre es requerido"))
                         return@post
                     }
+                    request.lastName.isBlank() -> {
+                        call.respond(HttpStatusCode.BadRequest, ErrorResponse("El apellido es requerido"))
+                        return@post
+                    }
                     request.email.isBlank() || !request.email.contains("@") -> {
                         call.respond(HttpStatusCode.BadRequest, ErrorResponse("Ingresa un correo electronico valido"))
+                        return@post
+                    }
+                    request.phone.isBlank() -> {
+                        call.respond(HttpStatusCode.BadRequest, ErrorResponse("El telefono es requerido"))
+                        return@post
+                    }
+                    request.role.isBlank() -> {
+                        call.respond(HttpStatusCode.BadRequest, ErrorResponse("Debes seleccionar un rol"))
                         return@post
                     }
                     request.password.length < 6 -> {
@@ -52,10 +66,24 @@ fun Application.module() {
                     }
                 }
 
-                val user = UserRepository.register(request.name, request.email, request.password)
+                val user = UserRepository.register(
+                    name = request.name,
+                    lastName = request.lastName,
+                    email = request.email,
+                    phone = request.phone,
+                    role = request.role,
+                    password = request.password,
+                )
                 val response = AuthResponse(
                     token = "token-${user.id}",
-                    user = UserResponse(id = user.id, name = user.name, email = user.email),
+                    user = UserResponse(
+                        id = user.id,
+                        name = user.name,
+                        lastName = user.lastName,
+                        email = user.email,
+                        phone = user.phone,
+                        role = user.role,
+                    ),
                 )
                 call.respond(HttpStatusCode.Created, response)
             }
@@ -71,7 +99,14 @@ fun Application.module() {
 
                 val response = AuthResponse(
                     token = "token-${user.id}",
-                    user = UserResponse(id = user.id, name = user.name, email = user.email),
+                    user = UserResponse(
+                        id = user.id,
+                        name = user.name,
+                        lastName = user.lastName,
+                        email = user.email,
+                        phone = user.phone,
+                        role = user.role,
+                    ),
                 )
                 call.respond(HttpStatusCode.OK, response)
             }

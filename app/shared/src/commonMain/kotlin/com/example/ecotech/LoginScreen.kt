@@ -19,7 +19,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -33,16 +35,31 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
-fun LoginScreen(onBack: () -> Unit, onNavigateToRegister: () -> Unit) {
+fun LoginScreen(onBack: () -> Unit, onNavigateToRegister: () -> Unit, onLoginSuccess: (UserResponse) -> Unit = {}) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    var isLoading by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
 
     fun validarFormulario() {
         errorMessage = when {
             email.isBlank() || password.isBlank() -> "Completa todos los campos"
             !email.contains("@") -> "Ingresa un correo válido"
             else -> null
+        }
+        if (errorMessage == null) {
+            scope.launch {
+                isLoading = true
+                errorMessage = null
+                val result = AuthApi.login(email.trim(), password)
+                isLoading = false
+                if (result.success && result.user != null) {
+                    onLoginSuccess(result.user)
+                } else {
+                    errorMessage = result.error
+                }
+            }
         }
     }
 
@@ -59,14 +76,23 @@ fun LoginScreen(onBack: () -> Unit, onNavigateToRegister: () -> Unit) {
         verticalArrangement = Arrangement.Center,
     ) {
         Text(
-            text = "Bienvenido",
+            text = "EcoTech",
             fontSize = 48.sp,
             fontWeight = FontWeight.Bold,
             color = Color.White
         )
         Spacer(modifier = Modifier.height(8.dp))
+
         Text(
-            text = "Inicia sesión para continuar",
+            text = "Inicia sesión",
+            fontSize = 25.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White.copy(alpha = 0.8f),
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "Introduce tu correo y contraseña",
             fontSize = 16.sp,
             color = Color.White.copy(alpha = 0.8f),
         )
@@ -112,6 +138,7 @@ fun LoginScreen(onBack: () -> Unit, onNavigateToRegister: () -> Unit) {
         Spacer(modifier = Modifier.height(32.dp))
         Button(
             onClick = { validarFormulario() },
+            enabled = !isLoading,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
@@ -120,7 +147,10 @@ fun LoginScreen(onBack: () -> Unit, onNavigateToRegister: () -> Unit) {
                 contentColor = Color(0xFF1B5E20),
             ),
         ) {
-            Text(text = "Entrar", fontSize = 18.sp)
+            Text(
+                text = if (isLoading) "Iniciando sesión..." else "Entrar",
+                fontSize = 18.sp
+            )
         }
         Spacer (modifier = Modifier.height(32.dp))
         Button(

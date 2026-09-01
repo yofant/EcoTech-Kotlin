@@ -18,6 +18,47 @@ This is a Kotlin Multiplatform project targeting Android, iOS, Web, Desktop (JVM
 
 * [/server](./server/src/main/kotlin) is for the Ktor server application.
 
+### Database configuration (server)
+
+The server saves users to a MySQL database. It reads connection settings from these
+environment variables (with the defaults shown):
+
+| Variable       | Default     | Description                  |
+|----------------|-------------|------------------------------|
+| `DB_HOST`      | `localhost` | MySQL host                   |
+| `DB_PORT`      | `3306`      | MySQL port                   |
+| `DB_NAME`      | `EcoTech`   | Database name                |
+| `DB_USER`      | `root`      | MySQL user                   |
+| `DB_PASSWORD`  | *(empty)*   | MySQL password               |
+
+Example (EC2 or local):
+
+```bash
+export DB_HOST=localhost
+export DB_PORT=3306
+export DB_NAME=EcoTech
+export DB_USER=root
+export DB_PASSWORD=tu_contraseña
+./gradlew :server:run
+```
+
+The server maps the app auth to your existing `Usuarios` table
+(`usuario_id` PK, `nombre`, `apellido`, `email`, `telefono`, `rol`).
+On startup it adds the missing `password_hash` column automatically, so the
+first time you run it after this change you don't need to alter the table by hand.
+
+> Roles accepted by registration match the `CK_Usuarios_Rol` check:
+> `Auditor`, `Operador`, `Tecnico`, `Administrador`.
+
+### API base URL (client)
+
+The app calls the server via `AuthApi.kt` (`app/shared/src/commonMain/kotlin/com/example/ecotech/AuthApi.kt`)
+at the `BASE_URL` constant (default `http://localhost:8080/api/auth`). Change it to point
+to your EC2 instance, e.g. `http://TU-IP-PUBLICA:8080/api/auth`.
+
+> Note for Android emulator: `localhost` refers to your PC, so use `http://10.0.2.2:8080/api/auth`
+> when the server runs on your machine.
+
 ### Running the apps
 
 Use the run configurations provided by the run widget in your IDE's toolbar. You can also use these commands and options:

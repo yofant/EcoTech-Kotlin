@@ -11,23 +11,38 @@ import androidx.compose.ui.tooling.preview.Preview
 enum class Screen {
     Welcome,
     Login,
-    Register
+    Register,
+    Home
 }
 
 @Composable
 fun App() {
     MaterialTheme {
         var screen by remember { mutableStateOf(Screen.Welcome) }
+        var currentUser by remember { mutableStateOf<UserResponse?>(null) }
+
         when (screen) {
             Screen.Welcome -> WelcomeScreen(
                 onContinue = { screen = Screen.Login },
             )
             Screen.Login -> LoginScreen(
                 onBack = { screen = Screen.Welcome },
-                onNavigateToRegister = { screen = Screen.Register }
+                onNavigateToRegister = { screen = Screen.Register },
+                onLoginSuccess = { user ->
+                    currentUser = user
+                    screen = Screen.Home
+                }
             )
             Screen.Register -> RegisterScreen(
-                onBackToLogin = { screen = Screen.Login }
+                onBackToLogin = { screen = Screen.Login },
+                onRegisterSuccess = { user ->
+                    currentUser = user
+                    screen = Screen.Home
+                }
+            )
+            Screen.Home -> HomeScreen(
+                user = currentUser,
+                onLogout = { screen = Screen.Login }
             )
         }
     }

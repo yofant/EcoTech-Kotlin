@@ -1,36 +1,65 @@
 package com.example.ecotech
 
+import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.transactions.transaction
 import java.security.MessageDigest
-import java.util.UUID
 
 data class User(
-    val id: String,
+    val id: Int,
     val name: String,
+    val lastName: String,
     val email: String,
+    val phone: String,
+    val role: String,
     val passwordHash: String,
 )
 
 object UserRepository {
-    private val users = mutableMapOf<String, User>()
 
-    fun findByEmail(email: String): User? =
-        users.values.find { it.email.equals(email, ignoreCase = true) }
+    private fun ResultRow.toUser() = User(
+        id = this[Usuarios.id],
+        name = this[Usuarios.name],
+        lastName = this[Usuarios.lastName],
+        email = this[Usuarios.email],
+        phone = this[Usuarios.phone],
+        role = this[Usuarios.role],
+        passwordHash = this[Usuarios.passwordHash],
+    )
+
+    fun findByEmail(email: String): User? = transaction {
+        Usuarios.selectAll()
+            .where { Usuarios.email eq email }
+            .singleOrNull()
+            ?.toUser()
+    }
 
     fun findByEmailAndPassword(email: String, password: String): User? {
         val user = findByEmail(email) ?: return null
         return if (hashPassword(password) == user.passwordHash) user else null
     }
 
-    fun register(name: String, email: String, password: String): User {
-        val id = UUID.randomUUID().toString()
-        val user = User(
+    fun register(name: String, lastName: String, email: String, phone: String, role: String, password: String): User {
+        val id = transaction {
+            Usuarios.insert {
+                it[Usuarios.name] = name
+                it[Usuarios.lastName] = lastName
+                it[Usuarios.email] = email
+                it[Usuarios.phone] = phone
+                it[Usuarios.role] = role
+                it[Usuarios.passwordHash] = hashPassword(password)
+            } get Usuarios.id
+        }
+        return User(
             id = id,
             name = name,
+            lastName = lastName,
             email = email,
+            phone = phone,
+            role = role,
             passwordHash = hashPassword(password),
         )
-        users[id] = user
-        return user
     }
 
     fun hashPassword(raw: String): String =

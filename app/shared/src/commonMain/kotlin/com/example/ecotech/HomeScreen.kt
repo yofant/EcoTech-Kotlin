@@ -23,9 +23,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-
 @Composable
-fun WelcomeScreen(onContinue: () -> Unit) {
+fun HomeScreen(user: UserResponse?, onLogout: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -41,27 +40,40 @@ fun WelcomeScreen(onContinue: () -> Unit) {
         Text(text = "♻️", fontSize = 96.sp)
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "EcoTech",
-            fontSize = 48.sp,
+            text = "¡Bienvenido, ${user?.name ?: "amigo"}!",
+            fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
             color = Color.White,
+            textAlign = TextAlign.Center,
         )
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Cada dispositivo reciclado es\n" +
-                "un paso hacia un planeta mas \n"+
-                "limpio y una tecnologia mas \n" +
-                    "consciente.",
-
+            text = "${user?.name} ${user?.lastName}",
             fontSize = 18.sp,
             color = Color.White.copy(alpha = 0.9f),
-            textAlign = TextAlign.Center,
-            fontWeight = FontWeight.Bold
-
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = user?.email ?: "",
+            fontSize = 16.sp,
+            color = Color.White.copy(alpha = 0.8f),
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = user?.phone ?: "",
+            fontSize = 16.sp,
+            color = Color.White.copy(alpha = 0.8f),
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = "Rol: ${user?.role ?: ""}",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Medium,
+            color = Color.White,
         )
         Spacer(modifier = Modifier.height(48.dp))
         Button(
-            onClick = onContinue,
+            onClick = onLogout,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
@@ -70,15 +82,25 @@ fun WelcomeScreen(onContinue: () -> Unit) {
                 contentColor = Color(0xFF1B5E20),
             ),
         ) {
-            Text(text = "Continuar", fontSize = 18.sp)
+            Text(text = "Cerrar sesión", fontSize = 18.sp)
         }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun WelcomeScreenPreview() {
+fun HomeScreenPreview() {
     MaterialTheme {
-        WelcomeScreen(onContinue = {})
+        HomeScreen(
+            user = UserResponse(
+                id = 1,
+                name = "Juan",
+                lastName = "Pérez",
+                email = "juan@mail.com",
+                phone = "1234567890",
+                role = "Usuario",
+            ),
+            onLogout = {}
+        )
     }
 }

@@ -38,3 +38,23 @@ data class AuthResponse(
 data class ErrorResponse(
     val error: String,
 )
+
+data class AuthResult(
+    val success: Boolean,
+    val user: UserResponse? = null,
+    val token: String? = null,
+    val error: String? = null,
+) {
+    companion object {
+        fun success(auth: AuthResponse) = AuthResult(
+            success = true,
+            user = auth.user,
+            token = auth.token,
+        )
+
+        fun failure(message: String) = AuthResult(
+            success = false,
+            error = message,
+        )
+    }
+}
