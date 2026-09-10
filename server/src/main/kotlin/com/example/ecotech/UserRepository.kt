@@ -1,10 +1,14 @@
 package com.example.ecotech
 
 import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.update
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.security.MessageDigest
+import java.time.LocalDateTime
 
 data class User(
     val id: Int,
@@ -13,6 +17,8 @@ data class User(
     val email: String,
     val phone: String,
     val role: String,
+    val active: Boolean,
+    val registrationDate: LocalDateTime?,
     val passwordHash: String,
 )
 
@@ -25,7 +31,20 @@ object UserRepository {
         email = this[Usuarios.email],
         phone = this[Usuarios.phone],
         role = this[Usuarios.role],
+        active = this[Usuarios.active],
+        registrationDate = this.getOrNull(Usuarios.registrationDate),
         passwordHash = this[Usuarios.passwordHash],
+    )
+
+    private fun User.toAdminDto() = AdminUserDto(
+        usuarioId = id,
+        nombre = name,
+        apellido = lastName,
+        email = email,
+        telefono = phone,
+        rol = role,
+        activo = active,
+        fechaRegistro = registrationDate?.formatEco(),
     )
 
     fun findByEmail(email: String): User? = transaction {
@@ -35,31 +54,69 @@ object UserRepository {
             ?.toUser()
     }
 
+    fun findById(id: Int): User? = transaction {
+        Usuarios.selectAll()
+            .where { Usuarios.id eq id }
+            .singleOrNull()
+            ?.toUser()
+    }
+
     fun findByEmailAndPassword(email: String, password: String): User? {
         val user = findByEmail(email) ?: return null
-        return if (hashPassword(password) == user.passwordHash) user else null
+        if (hashPassword(password) != user.passwordHash) return null
+        return if (user.active) user else null
     }
 
     fun register(name: String, lastName: String, email: String, phone: String, role: String, password: String): User {
         val id = transaction {
-            Usuarios.insert {
+            val newId = Usuarios.insert {
                 it[Usuarios.name] = name
                 it[Usuarios.lastName] = lastName
                 it[Usuarios.email] = email
                 it[Usuarios.phone] = phone
                 it[Usuarios.role] = role
+                it[Usuarios.active] = true
+                it[Usuarios.registrationDate] = now()
                 it[Usuarios.passwordHash] = hashPassword(password)
             } get Usuarios.id
+            Audit.record("Usuarios", "INSERT", newId, "Usuario registrado: $email")
+            newId
         }
-        return User(
-            id = id,
-            name = name,
-            lastName = lastName,
-            email = email,
-            phone = phone,
-            role = role,
-            passwordHash = hashPassword(password),
-        )
+        return requireNotNull(findById(id)) { "No se pudo crear el usuario" }
+    }
+
+    fun all(): List<AdminUserDto> = transaction {
+        Usuarios.selectAll()
+            .orderBy(Usuarios.id)
+            .map { it.toUser().toAdminDto() }
+    }
+
+    fun updateUser(id: Int, req: UpdateUserRequest): Boolean = transaction {
+        val updated = Usuarios.update({ Usuarios.id eq id }) {
+            req.nombre?.let { value -> it[Usuarios.name] = value }
+            req.apellido?.let { value -> it[Usuarios.lastName] = value }
+            req.email?.let { value -> it[Usuarios.email] = value }
+            req.telefono?.let { value -> it[Usuarios.phone] = value }
+            req.rol?.let { value -> it[Usuarios.role] = value }
+        }
+        if (updated > 0) Audit.record("Usuarios", "UPDATE", id, "Usuario modificado")
+        updated > 0
+    }
+
+    fun setActive(id: Int, active: Boolean): Boolean = transaction {
+        val updated = Usuarios.update({ Usuarios.id eq id }) {
+            it[Usuarios.active] = active
+        }
+        if (updated > 0) {
+            Audit.record("Usuarios", if (active) "ACTIVAR" else "INHABILITAR", id, "Usuario ${if (active) "activado" else "inhabilitado"}")
+        }
+        updated > 0
+    }
+
+    fun delete(id: Int): Boolean = transaction {
+        val deleted = Usuarios.deleteWhere { Usuarios.id eq id }
+        if (deleted > 0) Audit.record("Usuarios", "DELETE", id, "Usuario eliminado")
+        deleted > 0
     }
 
     fun hashPassword(raw: String): String =

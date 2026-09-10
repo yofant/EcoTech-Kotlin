@@ -35,7 +35,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
-fun LoginScreen(onBack: () -> Unit, onNavigateToRegister: () -> Unit, onLoginSuccess: (UserResponse) -> Unit = {}) {
+fun LoginScreen(
+    onBack: () -> Unit,
+    onNavigateToRegister: () -> Unit,
+    onForgotPassword: () -> Unit = {},
+    onLoginSuccess: (UserResponse) -> Unit = {},
+) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
@@ -172,6 +177,13 @@ fun LoginScreen(onBack: () -> Unit, onNavigateToRegister: () -> Unit, onLoginSuc
             Text(
                 text = "¿No tienes cuenta? Regístrate",
                 color = Color.White,
+                fontSize = 14.sp
+            )
+        }
+        TextButton(onClick = onForgotPassword) {
+            Text(
+                text = "¿Olvidaste tu contraseña?",
+                color = Color.White.copy(alpha = 0.9f),
                 fontSize = 14.sp
             )
         }

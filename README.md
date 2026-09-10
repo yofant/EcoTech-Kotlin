@@ -59,6 +59,104 @@ to your EC2 instance, e.g. `http://TU-IP-PUBLICA:8080/api/auth`.
 > Note for Android emulator: `localhost` refers to your PC, so use `http://10.0.2.2:8080/api/auth`
 > when the server runs on your machine.
 
+### Deploying the server to EC2
+
+1. Build a self-contained fat JAR (requires a JDK on your machine):
+
+   ```bash
+   ./gradlew :server:buildFatJar
+   # artifact: server/build/libs/server-all.jar
+   ```
+
+2. Upload it to your instance, for example:
+
+   ```bash
+   scp -i TU-CLAVE.pem server/build/libs/server-all.jar ubuntu@TU-IP:~
+   ```
+
+3. On the instance, install a JDK (Amazon Corretto 21 works) and a MySQL/MariaDB
+   service, then import the schema dump (`EcoTech.sql`) into a database named
+   `EcoTech`. The server auto-adds the missing `password_hash` column on `Usuarios`
+   on first boot.
+
+4. Run it with the environment variables from the table above:
+
+   ```bash
+   export DB_HOST=localhost
+   export DB_PORT=3306
+   export DB_NAME=EcoTech
+   export DB_USER=ecotech
+   export DB_PASSWORD=tu_contraseña_segura
+   java -jar server-all.jar
+   ```
+
+5. Open TCP port `8080` in the EC2 security group and verify:
+
+   ```bash
+   curl http://TU-IP-PUBLICA:8080/api/health
+   # {"status":"ok","database":true}
+   ```
+
+To run it as a background service, create a systemd unit
+(`/etc/systemd/system/ecotech.service`):
+
+```ini
+[Unit]
+Description=EcoTech API
+After=network.target mariadb.service
+
+[Service]
+Environment=DB_HOST=localhost
+Environment=DB_NAME=EcoTech
+Environment=DB_USER=ecotech
+Environment=DB_PASSWORD=tu_contraseña_segura
+ExecStart=/usr/bin/java -jar /home/ubuntu/server-all.jar
+Restart=on-failure
+User=ubuntu
+
+[Install]
+WantedBy=multi-user.target
+```
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now ecotech
+sudo systemctl status ecotech
+```
+
+### API endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET    | `/` | API info |
+| GET    | `/api/health` | Health check (reports DB connectivity) |
+| POST   | `/api/auth/register` | Register user (JSON: `name, lastName, email, phone, role, password`) |
+| POST   | `/api/auth/login` | Login (JSON: `email, password`) |
+| GET/POST | `/api/ciudades` | List / create cities |
+| PUT/DELETE | `/api/ciudades/{id}` | Update / delete a city |
+| GET/POST | `/api/tipos-equipo` | List / create equipment types |
+| PUT/DELETE | `/api/tipos-equipo/{id}` | Update / delete an equipment type |
+| GET/POST | `/api/donantes` | List / create donors |
+| PUT/DELETE | `/api/donantes/{id}` | Update / delete a donor |
+| GET/POST | `/api/equipos` | List (`?estado=`) / create equipment |
+| PUT/DELETE | `/api/equipos/{id}` | Update / delete equipment |
+| GET/POST | `/api/beneficiarios` | List / create beneficiaries |
+| PUT/DELETE | `/api/beneficiarios/{id}` | Update / delete a beneficiary |
+| GET/POST | `/api/diagnosticos` | List / create diagnostics |
+| PUT | `/api/diagnosticos/{id}` | Update a diagnostic |
+| GET/POST | `/api/reparaciones` | List / create repairs |
+| PUT | `/api/reparaciones/{id}` | Update a repair |
+| GET/POST | `/api/entregas` | List / create deliveries |
+| PUT | `/api/entregas/{id}` | Update a delivery |
+| GET/PUT | `/api/usuarios` | List / update users |
+| PATCH | `/api/usuarios/{id}/estado` | Enable/disable a user (JSON: `{ "activo": bool }`) |
+| GET    | `/api/auditoria` | Audit log |
+| GET    | `/api/stats/resumen` | Global stats |
+| GET    | `/api/stats/actividad-mensual` | Monthly activity (`?mes=YYYY-MM`) |
+
+All timestamps are serialized as `yyyy-MM-dd HH:mm:ss`. `Auditoria` is written
+automatically by the server on every INSERT/UPDATE/DELETE.
+
 ### Running the apps
 
 Use the run configurations provided by the run widget in your IDE's toolbar. You can also use these commands and options:

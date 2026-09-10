@@ -15,6 +15,16 @@ class ApplicationTest {
         }
         val response = client.get("/")
         assertEquals(HttpStatusCode.OK, response.status)
-        assertEquals("Hello, Ktor!", response.bodyAsText())
+        assertTrue(response.bodyAsText().contains("EcoTech API"))
+    }
+
+    @Test
+    fun testHealth() = testApplication {
+        application {
+            module()
+        }
+        val response = client.get("/api/health")
+        assertEquals(HttpStatusCode.OK, response.status)
+        assertTrue(response.bodyAsText().contains("\"status\""))
     }
 }
