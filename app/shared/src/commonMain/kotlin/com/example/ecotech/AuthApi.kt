@@ -14,7 +14,19 @@ import kotlinx.serialization.json.Json
 import kotlin.coroutines.cancellation.CancellationException
 
 object AuthApi {
-    private const val BASE_URL = "http://localhost:8080/api/auth"
+    /**
+     * URL base configurable. Si no se especifica, se detecta automáticamente según la plataforma:
+     * - Android (Emulador): http://10.0.2.2:8080/api/auth
+     * - Desktop / Otros: http://localhost:8080/api/auth
+     */
+    var customBaseUrl: String? = null
+
+    val baseUrl: String
+        get() = customBaseUrl ?: if (getPlatform().name.startsWith("Android")) {
+            "http://10.0.2.2:8080/api/auth"
+        } else {
+            "http://localhost:8080/api/auth"
+        }
 
     private val client = HttpClient {
         install(ContentNegotiation) {
@@ -33,7 +45,7 @@ object AuthApi {
         password: String,
     ): AuthResult {
         return try {
-            val response: HttpResponse = client.post("$BASE_URL/register") {
+            val response: HttpResponse = client.post("$baseUrl/register") {
                 contentType(ContentType.Application.Json)
                 setBody(
                     RegisterRequest(
@@ -50,13 +62,13 @@ object AuthApi {
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            AuthResult.failure("No se pudo conectar con el servidor. Revisa tu conexión.")
+            AuthResult.failure("No se pudo conectar con el servidor ($baseUrl). Revisa tu conexión.")
         }
     }
 
     suspend fun login(email: String, password: String): AuthResult {
         return try {
-            val response: HttpResponse = client.post("$BASE_URL/login") {
+            val response: HttpResponse = client.post("$baseUrl/login") {
                 contentType(ContentType.Application.Json)
                 setBody(LoginRequest(email = email, password = password))
             }
@@ -64,7 +76,7 @@ object AuthApi {
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            AuthResult.failure("No se pudo conectar con el servidor. Revisa tu conexión.")
+            AuthResult.failure("No se pudo conectar con el servidor ($baseUrl). Revisa tu conexión.")
         }
     }
 

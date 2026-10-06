@@ -14,7 +14,7 @@ import io.ktor.server.routing.route
 import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.sql.transactions.transaction
 
-private val ALLOWED_ROLES = listOf("Auditor", "Operador", "Tecnico", "Administrador")
+private val ALLOWED_ROLES = listOf("Usuario", "Vendedor", "Auditor", "Operador", "Tecnico", "Administrador")
 
 private fun ApplicationCall.pathId(): Int? = parameters["id"]?.toIntOrNull()
 
@@ -61,7 +61,7 @@ private fun Route.authRoutes() {
                 request.password.length < 6 ->
                     return@post call.error("La contrasena debe tener al menos 6 caracteres")
                 normalizeRole(request.role) == null ->
-                    return@post call.error("El rol debe ser: Auditor, Operador, Tecnico o Administrador")
+                    return@post call.error("Los roles permitidos son: ${ALLOWED_ROLES.joinToString()}")
                 UserRepository.findByEmail(request.email.trim()) != null ->
                     return@post call.conflict("El correo ya esta registrado")
             }

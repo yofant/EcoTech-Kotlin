@@ -15,6 +15,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -234,6 +235,147 @@ fun CollectionEventsScreen(onBack: () -> Unit) {
             }
             EcoSectionCard {
                 Text("Total eventos del mes: 28", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+            }
+        }
+    }
+}
+
+@Composable
+fun AuditorHomeScreen(
+    user: UserResponse?,
+    onLogout: () -> Unit,
+    onOpenUsers: () -> Unit,
+    onOpenStats: () -> Unit,
+    onOpenEvents: () -> Unit,
+) {
+    EcoBackground {
+        EcoTitle(text = "🔎 Panel Auditor", fontSize = 26, topPadding = 4)
+        Spacer(Modifier.height(4.dp))
+        EcoSubtitle("¡Hola, ${user?.name ?: "Auditor"}! Revisa la actividad y los registros de EcoTech.")
+        Spacer(Modifier.height(8.dp))
+
+        EcoBody {
+            EcoSectionTitle("📋 Resumen de auditoría")
+            EcoSectionCard {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    AdminMetric("Usuarios", "1.240", "👥", Modifier.weight(1f))
+                    AdminMetric("Eventos", "28", "📅", Modifier.weight(1f))
+                    AdminMetric("Revisiones", "96", "✅", Modifier.weight(1f))
+                }
+            }
+
+            EcoSectionTitle("🧭 Herramientas de revisión")
+            EcoSectionCard {
+                EcoNavItem("👥", "Revisar usuarios", "Consulta los registros de la plataforma", onClick = onOpenUsers)
+                EcoNavItem("📈", "Revisar indicadores", "Consulta las métricas comerciales", onClick = onOpenStats)
+                EcoNavItem("📅", "Revisar eventos", "Consulta la actividad de recolección", onClick = onOpenEvents)
+            }
+
+            EcoSecondaryButton(text = "Cerrar sesión", onClick = onLogout)
+        }
+    }
+}
+
+@Composable
+fun OperatorHomeScreen(
+    user: UserResponse?,
+    onLogout: () -> Unit,
+    onOpenTracking: () -> Unit,
+    onOpenEvents: () -> Unit,
+    onOpenChat: () -> Unit,
+    onOpenNotifications: () -> Unit,
+) {
+    EcoBackground {
+        EcoTitle(text = "📦 Panel Operador", fontSize = 26, topPadding = 4)
+        Spacer(Modifier.height(4.dp))
+        EcoSubtitle("¡Hola, ${user?.name ?: "Operador"}! Coordina entregas y puntos de recolección.")
+        Spacer(Modifier.height(8.dp))
+
+        EcoBody {
+            EcoSectionTitle("🚚 Operación de hoy")
+            EcoSectionCard {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    AdminMetric("Entregas", "8", "🚚", Modifier.weight(1f))
+                    AdminMetric("En curso", "3", "📍", Modifier.weight(1f))
+                    AdminMetric("Eventos", "2", "📅", Modifier.weight(1f))
+                }
+            }
+
+            EcoSectionTitle("🧰 Tareas")
+            EcoSectionCard {
+                EcoNavItem("🚚", "Coordinar entregas", "Consulta envíos y su estado", onClick = onOpenTracking)
+                EcoNavItem("♻️", "Gestionar recolecciones", "Consulta eventos y equipos recolectados", onClick = onOpenEvents)
+                EcoNavItem("💬", "Contactar usuarios", "Resuelve preguntas sobre entregas", onClick = onOpenChat)
+                EcoNavItem("🔔", "Ver alertas", "Revisa novedades operativas", onClick = onOpenNotifications)
+            }
+
+            EcoSecondaryButton(text = "Cerrar sesión", onClick = onLogout)
+        }
+    }
+}
+
+@Composable
+fun TechnicianHomeScreen(
+    user: UserResponse?,
+    onLogout: () -> Unit,
+    onOpenInspections: () -> Unit,
+    onOpenChat: () -> Unit,
+    onOpenNotifications: () -> Unit,
+) {
+    EcoBackground {
+        EcoTitle(text = "🛠️ Panel Técnico", fontSize = 26, topPadding = 4)
+        Spacer(Modifier.height(4.dp))
+        EcoSubtitle("¡Hola, ${user?.name ?: "Técnico"}! Inspecciona y registra el estado de los equipos.")
+        Spacer(Modifier.height(8.dp))
+
+        EcoBody {
+            EcoSectionTitle("🔧 Trabajo técnico")
+            EcoSectionCard {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    AdminMetric("Asignados", "${DemoData.featuredProducts.size}", "📋", Modifier.weight(1f))
+                    AdminMetric("Reparaciones", "3", "🔩", Modifier.weight(1f))
+                    AdminMetric("Listos", "12", "✅", Modifier.weight(1f))
+                }
+            }
+
+            EcoSectionTitle("🧰 Herramientas")
+            EcoSectionCard {
+                EcoNavItem("🔍", "Inspeccionar equipos", "Registra el diagnóstico de cada equipo", onClick = onOpenInspections)
+                EcoNavItem("💬", "Consultar soporte", "Coordina con el equipo EcoTech", onClick = onOpenChat)
+                EcoNavItem("🔔", "Ver alertas técnicas", "Revisa avisos de equipos", onClick = onOpenNotifications)
+            }
+
+            EcoSecondaryButton(text = "Cerrar sesión", onClick = onLogout)
+        }
+    }
+}
+
+@Composable
+fun TechnicalInspectionsScreen(onBack: () -> Unit) {
+    val reviewedProducts = remember { mutableStateMapOf<String, Boolean>() }
+    val reviewedCount = reviewedProducts.values.count { it }
+
+    EcoBackground {
+        EcoBackHeader(title = "Inspección de equipos", onBack = onBack)
+        Spacer(Modifier.height(12.dp))
+        EcoSubtitle("Registra la revisión técnica de los equipos asignados.")
+        Spacer(Modifier.height(8.dp))
+
+        EcoBody {
+            EcoSectionCard {
+                MetricRow("Equipos revisados", "$reviewedCount de ${DemoData.featuredProducts.size}")
+            }
+            DemoData.featuredProducts.forEach { product ->
+                EcoSectionCard {
+                    Text("${product.emoji} ${product.name}", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                    Text("${product.category} • ${product.condition}", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Spacer(Modifier.height(8.dp))
+                    EcoPrimaryButton(
+                        text = if (reviewedProducts[product.name] == true) "Inspección registrada" else "Marcar como revisado",
+                        onClick = { reviewedProducts[product.name] = true },
+                        enabled = reviewedProducts[product.name] != true,
+                    )
+                }
             }
         }
     }

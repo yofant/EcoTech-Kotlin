@@ -27,6 +27,10 @@ enum class Screen {
     CustomerRecords,
     SellerStats,
     AdminHome,
+    AuditorHome,
+    OperatorHome,
+    TechnicianHome,
+    TechnicalInspections,
     DeliveryTracking,
     UserList,
     UserOptions,
@@ -54,7 +58,10 @@ fun App(darkTheme: Boolean? = null) {
 
         fun homeForRole(user: UserResponse?): Screen = when (user?.role?.lowercase()) {
             "administrador" -> Screen.AdminHome
-            "vendedor", "tecnico", "operador" -> Screen.SellerHome
+            "auditor" -> Screen.AuditorHome
+            "operador" -> Screen.OperatorHome
+            "tecnico" -> Screen.TechnicianHome
+            "vendedor" -> Screen.SellerHome
             else -> Screen.CustomerHome
         }
 
@@ -65,6 +72,7 @@ fun App(darkTheme: Boolean? = null) {
             Screen.Login -> LoginScreen(
                 onBack = { goBack() },
                 onNavigateToRegister = { navigateTo(Screen.Register) },
+                onForgotPassword = { navigateTo(Screen.ForgotPassword) },
                 onLoginSuccess = { user ->
                     currentUser = user
                     screen = homeForRole(user)
@@ -124,6 +132,7 @@ fun App(darkTheme: Boolean? = null) {
             )
             Screen.Chat -> ChatScreen(
                 onBack = { goBack() },
+                variant = if (currentUser?.role?.lowercase() in listOf("usuario", "cliente")) 2 else 1,
             )
             Screen.SellerHome -> SellerHomeScreen(
                 user = currentUser,
@@ -156,6 +165,31 @@ fun App(darkTheme: Boolean? = null) {
                 onOpenEvents = { navigateTo(Screen.CollectionEvents) },
                 onOpenChat = { navigateTo(Screen.Chat) },
                 onOpenNotifications = { navigateTo(Screen.Notifications) },
+            )
+            Screen.AuditorHome -> AuditorHomeScreen(
+                user = currentUser,
+                onLogout = { currentUser = null; screen = Screen.Login },
+                onOpenUsers = { navigateTo(Screen.UserList) },
+                onOpenStats = { navigateTo(Screen.SellerStats) },
+                onOpenEvents = { navigateTo(Screen.CollectionEvents) },
+            )
+            Screen.OperatorHome -> OperatorHomeScreen(
+                user = currentUser,
+                onLogout = { currentUser = null; screen = Screen.Login },
+                onOpenTracking = { navigateTo(Screen.DeliveryTracking) },
+                onOpenEvents = { navigateTo(Screen.CollectionEvents) },
+                onOpenChat = { navigateTo(Screen.Chat) },
+                onOpenNotifications = { navigateTo(Screen.Notifications) },
+            )
+            Screen.TechnicianHome -> TechnicianHomeScreen(
+                user = currentUser,
+                onLogout = { currentUser = null; screen = Screen.Login },
+                onOpenInspections = { navigateTo(Screen.TechnicalInspections) },
+                onOpenChat = { navigateTo(Screen.Chat) },
+                onOpenNotifications = { navigateTo(Screen.Notifications) },
+            )
+            Screen.TechnicalInspections -> TechnicalInspectionsScreen(
+                onBack = { goBack() },
             )
             Screen.DeliveryTracking -> DeliveryTrackingScreen(
                 onBack = { goBack() },

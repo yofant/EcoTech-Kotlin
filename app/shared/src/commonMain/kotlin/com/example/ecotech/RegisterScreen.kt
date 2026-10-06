@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.launch
 
-private val roles = listOf("Auditor", "Operador", "Tecnico", "Administrador")
+private val roles = listOf("Usuario", "Vendedor", "Auditor", "Operador", "Tecnico", "Administrador")
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

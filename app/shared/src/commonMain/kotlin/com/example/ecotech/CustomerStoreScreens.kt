@@ -44,7 +44,7 @@ fun CustomerHomeScreen(
     onOpenChat: () -> Unit,
 ) {
     EcoBackground {
-        EcoTitle(text = "♻️ EcoTech", fontSize = 30, topPadding = 4)
+        EcoTitle(text = "♻️ Panel Usuario", fontSize = 30, topPadding = 4)
         Spacer(Modifier.height(4.dp))
         EcoSubtitle("¡Hola, ${user?.name ?: "Cliente"}! ¿Qué tecnología reutilizamos hoy?")
         Spacer(Modifier.height(8.dp))
@@ -70,6 +70,12 @@ fun CustomerHomeScreen(
                 DemoData.featuredProducts.forEach { product ->
                     ProductRow(product)
                 }
+            }
+
+            EcoSectionTitle("💬 Atención al usuario")
+            EcoSectionCard {
+                EcoNavItem("💬", "Contactar a un vendedor", "Resuelve dudas sobre productos y pedidos", onClick = onOpenChat)
+                EcoNavItem("🔔", "Mis notificaciones", "Novedades de pedidos y promociones", onClick = onOpenNotifications)
             }
 
             Spacer(Modifier.height(8.dp))

@@ -6,6 +6,7 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.batchInsert
+import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.javatime.datetime
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -13,15 +14,19 @@ import java.time.LocalDateTime
 
 object DatabaseFactory {
 
-    fun init() {
-        val host = System.getenv("DB_HOST") ?: System.getProperty("DB_HOST") ?: "54.234.66.211"
+    @Volatile
+    var isConnected: Boolean = false
+        private set
+
+    fun init(throwOnError: Boolean = false) {
+        val host = System.getenv("DB_HOST") ?: System.getProperty("DB_HOST") ?: "98.93.249.61"
         val port = System.getenv("DB_PORT") ?: System.getProperty("DB_PORT") ?: "3306"
         val databaseName = System.getenv("DB_NAME") ?: System.getProperty("DB_NAME") ?: "ecotech"
         val user = System.getenv("DB_USER") ?: System.getProperty("DB_USER") ?: "admin"
         val password = System.getenv("DB_PASSWORD") ?: System.getProperty("DB_PASSWORD") ?: "EcoTech"
 
         println("=========================================================")
-        println("📡 Conectando a MySQL en AWS / Servidor...")
+        println("📡 Conectando a MySQL ($host:$port/$databaseName)...")
         println("   - Host: $host")
         println("   - Puerto: $port")
         println("   - Base de Datos: $databaseName")
@@ -35,6 +40,7 @@ object DatabaseFactory {
                 username = user
                 this.password = password
                 maximumPoolSize = 10
+                connectionTimeout = 5000 // 5 segundos maximo antes de timeout
                 isAutoCommit = false
                 transactionIsolation = "TRANSACTION_REPEATABLE_READ"
                 validate()
@@ -57,15 +63,18 @@ object DatabaseFactory {
                 )
             }
 
-            println("✅ Conexión a base de datos en AWS establecida con éxito.")
+            println("✅ Conexión a la base de datos establecida con éxito.")
             println("✅ Tablas sincronizadas e inicializadas correctamente.")
 
             seedIfEmpty()
+            isConnected = true
         } catch (e: Exception) {
-            println("❌ Error al conectar con la base de datos MySQL en AWS:")
+            isConnected = false
+            println("⚠️ Advertencia: No se pudo conectar con la base de datos MySQL ($host:$port/$databaseName):")
             println("   Detalle: ${e.message}")
-            println("   Sugerencia: Revisa que el 'Security Group' en AWS permita conexiones entrantes en el puerto 3306 y que las credenciales sean correctas.")
-            throw e
+            println("   Sugerencia: Puedes sobreescribir DB_HOST, DB_PORT, DB_NAME, DB_USER y DB_PASSWORD.")
+            println("   El servidor continuará en ejecución. Consulta /api/health para verificar conectividad.")
+            if (throwOnError) throw e
         }
     }
 
@@ -100,6 +109,19 @@ object DatabaseFactory {
                 ) { (nombreTipo, descripcionTipo) ->
                     this[TiposEquipo.nombre] = nombreTipo
                     this[TiposEquipo.descripcion] = descripcionTipo
+                }
+            }
+
+            if (Usuarios.selectAll().empty()) {
+                Usuarios.insert {
+                    it[name] = "Yofan"
+                    it[lastName] = "Tellez"
+                    it[email] = "yojantellez8@gmail.com"
+                    it[phone] = "3001234567"
+                    it[role] = "Administrador"
+                    it[active] = true
+                    it[registrationDate] = now()
+                    it[passwordHash] = "61a66994d1c3805ccdee514aa7a9cc55936dd1e97203b76932b74832287a7702" // Clave inicial: EcoTech2026!
                 }
             }
         }
