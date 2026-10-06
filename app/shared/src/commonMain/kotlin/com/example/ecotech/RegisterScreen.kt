@@ -1,26 +1,22 @@
 package com.example.ecotech
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -29,17 +25,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
+import kotlinx.coroutines.launch
 
 private val roles = listOf("Auditor", "Operador", "Tecnico", "Administrador")
 
@@ -53,6 +50,8 @@ fun RegisterScreen(onBackToLogin: () -> Unit, onRegisterSuccess: (UserResponse) 
     var role by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
+    var confirmPasswordVisible by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) }
     var roleExpanded by remember { mutableStateOf(false) }
@@ -62,9 +61,9 @@ fun RegisterScreen(onBackToLogin: () -> Unit, onRegisterSuccess: (UserResponse) 
         errorMessage = when {
             name.isBlank() || lastName.isBlank() || email.isBlank() || phone.isBlank() ||
                 role.isBlank() || password.isBlank() || confirmPassword.isBlank() ->
-                "Completa todos los campos"
-            !email.contains("@") -> "Ingresa un correo válido"
-            phone.length < 7 -> "Ingresa un teléfono válido"
+                "Completa todos los campos obligatorios"
+            !email.contains("@") -> "Ingresa un correo electrónico válido"
+            phone.length < 7 -> "Ingresa un número de teléfono válido"
             role.isBlank() -> "Selecciona un rol"
             password.length < 6 -> "La contraseña debe tener al menos 6 caracteres"
             password != confirmPassword -> "Las contraseñas no coinciden"
@@ -92,182 +91,202 @@ fun RegisterScreen(onBackToLogin: () -> Unit, onRegisterSuccess: (UserResponse) 
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(Color(0xFF1B5E20), Color(0xFF66BB6A))
-                )
-            )
-            .padding(32.dp)
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Text(
-            text = "Crear Cuenta",
-            fontSize = 40.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "Únete a EcoTech y recicla",
-            fontSize = 16.sp,
-            color = Color.White.copy(alpha = 0.8f),
-        )
-        Spacer(modifier = Modifier.height(32.dp))
+    EcoBackground {
+        EcoBackHeader(title = "Crear Cuenta", onBack = onBackToLogin)
 
-        OutlinedTextField(
-            value = name,
-            onValueChange = { name = it },
-            label = { Text("Nombre") },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            colors = textFieldColors()
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = lastName,
-            onValueChange = { lastName = it },
-            label = { Text("Apellido") },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            colors = textFieldColors()
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Correo electrónico") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            colors = textFieldColors()
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = phone,
-            onValueChange = { phone = it },
-            label = { Text("Teléfono") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            colors = textFieldColors()
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-
-        ExposedDropdownMenuBox(
-            expanded = roleExpanded,
-            onExpandedChange = { roleExpanded = it },
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(vertical = 8.dp, horizontal = 4.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
         ) {
-            OutlinedTextField(
-                value = role,
-                onValueChange = {},
-                readOnly = true,
-                label = { Text("Rol") },
-                placeholder = { Text("Selecciona tu rol") },
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = roleExpanded) },
-                singleLine = true,
+            Box(
                 modifier = Modifier
-                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                    .fillMaxWidth(),
-                colors = textFieldColors()
-            )
-            ExposedDropdownMenu(
-                expanded = roleExpanded,
-                onDismissRequest = { roleExpanded = false },
+                    .size(64.dp)
+                    .clip(CircleShape),
+                contentAlignment = Alignment.Center
             ) {
-                roles.forEach { option ->
-                    DropdownMenuItem(
-                        text = { Text(option) },
-                        onClick = {
-                            role = option
-                            roleExpanded = false
-                        }
-                    )
+                Text(text = "📝", fontSize = 38.sp)
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            EcoTitle(text = "Únete a EcoTech", fontSize = 30)
+            EcoSubtitle(text = "Crea tu cuenta para comenzar a reciclar y gestionar equipos")
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // First Name
+            EcoOutlinedTextField(
+                value = name,
+                onValueChange = { name = it; errorMessage = null },
+                label = "Nombre",
+                placeholder = "Juan",
+                leadingIcon = {
+                    Text("👤", fontSize = 18.sp, modifier = Modifier.padding(start = 12.dp, end = 4.dp))
+                },
+                enabled = !isLoading,
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Last Name
+            EcoOutlinedTextField(
+                value = lastName,
+                onValueChange = { lastName = it; errorMessage = null },
+                label = "Apellido",
+                placeholder = "Pérez",
+                leadingIcon = {
+                    Text("👤", fontSize = 18.sp, modifier = Modifier.padding(start = 12.dp, end = 4.dp))
+                },
+                enabled = !isLoading,
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Email
+            EcoOutlinedTextField(
+                value = email,
+                onValueChange = { email = it; errorMessage = null },
+                label = "Correo electrónico",
+                placeholder = "juan@ecotech.com",
+                leadingIcon = {
+                    Text("📧", fontSize = 18.sp, modifier = Modifier.padding(start = 12.dp, end = 4.dp))
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                enabled = !isLoading,
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Phone
+            EcoOutlinedTextField(
+                value = phone,
+                onValueChange = { phone = it; errorMessage = null },
+                label = "Teléfono",
+                placeholder = "+57 300 123 4567",
+                leadingIcon = {
+                    Text("📱", fontSize = 18.sp, modifier = Modifier.padding(start = 12.dp, end = 4.dp))
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                enabled = !isLoading,
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Role Selector Dropdown
+            ExposedDropdownMenuBox(
+                expanded = roleExpanded,
+                onExpandedChange = { if (!isLoading) roleExpanded = it },
+            ) {
+                EcoOutlinedTextField(
+                    value = role,
+                    onValueChange = {},
+                    label = "Rol de usuario",
+                    placeholder = "Selecciona tu rol",
+                    leadingIcon = {
+                        Text("🛡️", fontSize = 18.sp, modifier = Modifier.padding(start = 12.dp, end = 4.dp))
+                    },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = roleExpanded) },
+                    modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
+                    enabled = !isLoading,
+                )
+                ExposedDropdownMenu(
+                    expanded = roleExpanded,
+                    onDismissRequest = { roleExpanded = false },
+                ) {
+                    roles.forEach { option ->
+                        DropdownMenuItem(
+                            text = { Text(option, fontWeight = FontWeight.Medium) },
+                            onClick = {
+                                role = option
+                                roleExpanded = false
+                            }
+                        )
+                    }
                 }
             }
-        }
-        Spacer(modifier = Modifier.height(16.dp))
 
-        OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("Contraseña") },
-            visualTransformation = PasswordVisualTransformation(),
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            colors = textFieldColors()
-        )
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-        OutlinedTextField(
-            value = confirmPassword,
-            onValueChange = { confirmPassword = it },
-            label = { Text("Confirmar contraseña") },
-            visualTransformation = PasswordVisualTransformation(),
-            singleLine = true,
-            isError = errorMessage != null,
-            supportingText = {
-                errorMessage?.let { Text(it, color = Color.Yellow) }
-            },
-            modifier = Modifier.fillMaxWidth(),
-            colors = textFieldColors()
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Button(
-            onClick = { validarFormulario() },
-            enabled = !isLoading,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.White,
-                contentColor = Color(0xFF1B5E20),
-            ),
-        ) {
-            Text(
-                text = if (isLoading) "Registrando..." else "Registrarse",
-                fontSize = 18.sp
+            // Password
+            EcoOutlinedTextField(
+                value = password,
+                onValueChange = { password = it; errorMessage = null },
+                label = "Contraseña",
+                placeholder = "••••••••",
+                leadingIcon = {
+                    Text("🔒", fontSize = 18.sp, modifier = Modifier.padding(start = 12.dp, end = 4.dp))
+                },
+                trailingIcon = {
+                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                        Text(if (passwordVisible) "👁️" else "🙈", fontSize = 18.sp)
+                    }
+                },
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                enabled = !isLoading,
             )
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-        TextButton(onClick = onBackToLogin) {
-            Text(
-                text = "¿Ya tienes cuenta? Inicia sesión",
-                color = Color.White,
-                fontSize = 14.sp
+            // Confirm Password
+            EcoOutlinedTextField(
+                value = confirmPassword,
+                onValueChange = { confirmPassword = it; errorMessage = null },
+                label = "Confirmar contraseña",
+                placeholder = "••••••••",
+                leadingIcon = {
+                    Text("🔐", fontSize = 18.sp, modifier = Modifier.padding(start = 12.dp, end = 4.dp))
+                },
+                trailingIcon = {
+                    IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
+                        Text(if (confirmPasswordVisible) "👁️" else "🙈", fontSize = 18.sp)
+                    }
+                },
+                visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                isError = errorMessage != null,
+                supportingText = errorMessage?.let {
+                    { Text(it, color = Color(0xFFFBBF24), fontWeight = FontWeight.Bold, fontSize = 12.sp) }
+                },
+                enabled = !isLoading,
             )
+
+            Spacer(modifier = Modifier.height(28.dp))
+
+            // Register CTA Button
+            EcoPrimaryButton(
+                text = "Registrar mi cuenta",
+                onClick = { validarFormulario() },
+                isLoading = isLoading,
+                enabled = !isLoading
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            TextButton(onClick = onBackToLogin) {
+                Text(
+                    text = "¿Ya tienes cuenta? ",
+                    color = Color.White.copy(alpha = 0.85f),
+                    fontSize = 14.sp
+                )
+                Text(
+                    text = "Inicia sesión",
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp
+                )
+            }
         }
     }
 }
 
-@Composable
-private fun textFieldColors() = OutlinedTextFieldDefaults.colors(
-    focusedTextColor = Color.White,
-    unfocusedTextColor = Color.White,
-    focusedLabelColor = Color.White,
-    unfocusedLabelColor = Color.White.copy(alpha = 0.7f),
-    focusedBorderColor = Color.White,
-    unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
-    errorBorderColor = Color.Yellow,
-    errorLabelColor = Color.Yellow,
-    errorTextColor = Color.White
-)
-
 @Preview(showBackground = true)
 @Composable
 fun RegisterPreview() {
-    MaterialTheme {
+    EcoTheme {
         RegisterScreen(onBackToLogin = {})
     }
 }

@@ -1,6 +1,5 @@
 package com.example.ecotech
 
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,8 +37,8 @@ enum class Screen {
 }
 
 @Composable
-fun App() {
-    MaterialTheme {
+fun App(darkTheme: Boolean? = null) {
+    EcoTheme(darkTheme = darkTheme) {
         var screen by remember { mutableStateOf(Screen.Welcome) }
         var currentUser by remember { mutableStateOf<UserResponse?>(null) }
         val backStack = remember { ArrayDeque<Screen>() }

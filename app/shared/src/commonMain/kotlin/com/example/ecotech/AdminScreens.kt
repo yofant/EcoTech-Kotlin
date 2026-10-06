@@ -81,12 +81,12 @@ private fun AdminMetric(
         modifier = modifier
             .height(96.dp)
             .padding(horizontal = 4.dp)
-            .background(EcoGreen.copy(alpha = 0.15f), RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.15f), RoundedCornerShape(12.dp))
             .padding(8.dp),
     ) {
         Text(emoji, fontSize = 20.sp)
-        Text(value, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = EcoGreenDark)
-        Text(title, fontSize = 11.sp, color = Color.Gray)
+        Text(value, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+        Text(title, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
@@ -104,10 +104,10 @@ fun DeliveryTrackingScreen(onBack: () -> Unit) {
                 DemoData.deliveries.forEach { delivery ->
                     Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
-                            Text(delivery.name, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = EcoGreenDark)
-                            Text(delivery.email, fontSize = 12.sp, color = Color.Gray)
+                            Text(delivery.name, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.primary)
+                            Text(delivery.email, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
-                        Text("${3 - delivery.totalOrders + 1}/3", fontSize = 13.sp, color = EcoGreen, fontWeight = FontWeight.Bold)
+                        Text("${3 - delivery.totalOrders + 1}/3", fontSize = 13.sp, color = MaterialTheme.colorScheme.secondary, fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -146,24 +146,24 @@ fun UserListScreen(onBack: () -> Unit, onOpenUserOptions: () -> Unit) {
                             modifier = Modifier
                                 .width(38.dp)
                                 .height(38.dp)
-                                .background(EcoGreen.copy(alpha = 0.2f), RoundedCornerShape(19.dp)),
+                                .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f), RoundedCornerShape(19.dp)),
                             contentAlignment = Alignment.Center,
                         ) {
                             Text("👤", fontSize = 18.sp)
                         }
                         Spacer(Modifier.width(10.dp))
                         Column(Modifier.weight(1f)) {
-                            Text(user.name, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = EcoGreenDark)
-                            Text(user.email, fontSize = 12.sp, color = Color.Gray)
+                            Text(user.name, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.primary)
+                            Text(user.email, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
-                        Text("Activo", fontSize = 12.sp, color = EcoGreen, fontWeight = FontWeight.Medium)
+                        Text("Activo", fontSize = 12.sp, color = MaterialTheme.colorScheme.secondary, fontWeight = FontWeight.Medium)
                     }
                 }
             }
 
             EcoSectionTitle("🖱️ Acciones")
             EcoSectionCard {
-                Text("Selecciona un usuario para gestionar sus registros (modificar, eliminar o inhabilitar).", fontSize = 13.sp, color = Color.Gray)
+                Text("Selecciona un usuario para gestionar sus registros (modificar, eliminar o inhabilitar).", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
 
             Spacer(Modifier.height(4.dp))
@@ -219,21 +219,21 @@ fun CollectionEventsScreen(onBack: () -> Unit) {
                             modifier = Modifier
                                 .width(38.dp)
                                 .height(38.dp)
-                                .background(EcoGreen.copy(alpha = 0.2f), RoundedCornerShape(19.dp)),
+                                .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f), RoundedCornerShape(19.dp)),
                             contentAlignment = Alignment.Center,
                         ) {
                             Text("📅", fontSize = 18.sp)
                         }
                         Spacer(Modifier.width(10.dp))
                         Column(Modifier.weight(1f)) {
-                            Text(event.name, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = EcoGreenDark)
-                            Text(event.email, fontSize = 12.sp, color = Color.Gray)
+                            Text(event.name, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.primary)
+                            Text(event.email, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
                 }
             }
             EcoSectionCard {
-                Text("Total eventos del mes: 28", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = EcoGreenDark)
+                Text("Total eventos del mes: 28", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
             }
         }
     }
@@ -245,8 +245,8 @@ private fun MetricRow(label: String, value: String) {
         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        Text(label, fontSize = 14.sp, color = Color.Gray)
-        Text(value, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = EcoGreenDark)
+        Text(label, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(value, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
     }
 }
 

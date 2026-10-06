@@ -84,12 +84,12 @@ private fun MetricBox(
         modifier = modifier
             .height(86.dp)
             .padding(horizontal = 4.dp)
-            .background(EcoGreen.copy(alpha = 0.15f), RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.15f), RoundedCornerShape(12.dp))
             .padding(8.dp),
     ) {
         Text(emoji, fontSize = 20.sp)
-        Text(value, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = EcoGreenDark)
-        Text(title, fontSize = 11.sp, color = Color.Gray)
+        Text(value, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+        Text(title, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
@@ -104,7 +104,7 @@ fun ProductGallery(title: String, subtitle: String, products: List<ProductItem>,
         EcoBody {
             EcoSectionCard {
                 if (products.isEmpty()) {
-                    Text("No hay equipos registrados", fontSize = 14.sp, color = Color.Gray)
+                    Text("No hay equipos registrados", fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 } else {
                     products.forEach { ProductRow(it) }
                 }
@@ -152,17 +152,17 @@ fun CustomerRecordsScreen(onBack: () -> Unit) {
                             modifier = Modifier
                                 .width(40.dp)
                                 .height(40.dp)
-                                .background(EcoGreen.copy(alpha = 0.2f), RoundedCornerShape(20.dp)),
+                                .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f), RoundedCornerShape(20.dp)),
                             contentAlignment = Alignment.Center,
                         ) {
                             Text("🧾", fontSize = 20.sp)
                         }
                         Spacer(Modifier.width(12.dp))
                         Column(Modifier.weight(1f)) {
-                            Text(record.name, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = EcoGreenDark)
-                            Text(record.email, fontSize = 12.sp, color = Color.Gray)
+                            Text(record.name, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.primary)
+                            Text(record.email, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
-                        Text("${record.totalOrders} pedidos", fontSize = 12.sp, fontWeight = FontWeight.Medium, color = EcoGreen)
+                        Text("${record.totalOrders} pedidos", fontSize = 12.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.secondary)
                     }
                 }
             }
@@ -198,15 +198,15 @@ fun SellerStatsScreen(onBack: () -> Unit) {
                         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Text(months[index], fontSize = 12.sp, color = Color.Gray, modifier = Modifier.width(36.dp))
+                        Text(months[index], fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.width(36.dp))
                         Box(
                             modifier = Modifier
                                 .height(18.dp)
                                 .fillMaxWidth((sales.toFloat() / maxSales) * 0.75f)
-                                .background(EcoGreen, RoundedCornerShape(4.dp)),
+                                .background(MaterialTheme.colorScheme.secondary, RoundedCornerShape(4.dp)),
                         )
                         Spacer(Modifier.width(6.dp))
-                        Text("$sales", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = EcoGreenDark)
+                        Text("$sales", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                     }
                 }
             }
@@ -227,8 +227,8 @@ private fun MetricRow(label: String, value: String) {
         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        Text(label, fontSize = 14.sp, color = Color.Gray)
-        Text(value, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = EcoGreenDark)
+        Text(label, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(value, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
     }
 }
 

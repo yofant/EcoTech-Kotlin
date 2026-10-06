@@ -48,17 +48,17 @@ fun ProfileScreen(
                         modifier = Modifier
                             .width(56.dp)
                             .height(56.dp)
-                            .background(EcoGreen, RoundedCornerShape(28.dp)),
+                            .background(MaterialTheme.colorScheme.secondary, RoundedCornerShape(28.dp)),
                         contentAlignment = Alignment.Center,
                     ) {
                         Text("👤", fontSize = 28.sp)
                     }
                     Spacer(Modifier.width(14.dp))
                     Column {
-                        Text("${user?.name} ${user?.lastName}", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = EcoGreenDark)
-                        Text(user?.email ?: "", fontSize = 13.sp, color = Color.Gray)
-                        Text(user?.phone ?: "", fontSize = 13.sp, color = Color.Gray)
-                        Text("Rol: ${user?.role ?: "Cliente"}", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = EcoGreen)
+                        Text("${user?.name} ${user?.lastName}", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                        Text(user?.email ?: "", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(user?.phone ?: "", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text("Rol: ${user?.role ?: "Cliente"}", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.secondary)
                     }
                 }
             }
@@ -90,11 +90,11 @@ fun NotificationsScreen(onBack: () -> Unit, onOpenChat: () -> Unit) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text("🔔", fontSize = 18.sp)
                             Spacer(Modifier.width(10.dp))
-                            Text(notification.title, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = EcoGreenDark)
+                            Text(notification.title, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                             Spacer(Modifier.weight(1f))
-                            Text(notification.time, fontSize = 11.sp, color = Color.Gray)
+                            Text(notification.time, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
-                        Text(notification.body, fontSize = 13.sp, color = Color.Gray, modifier = Modifier.padding(start = 28.dp))
+                        Text(notification.body, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(start = 28.dp))
                     }
                 }
             }
@@ -122,16 +122,16 @@ fun ChatScreen(onBack: () -> Unit, variant: Int = 1) {
                 Text(if (variant == 2) "👩‍💼" else "🏪", fontSize = 26.sp)
                 Spacer(Modifier.width(10.dp))
                 Column {
-                    Text(contact, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = EcoGreenDark)
-                    Text(online, fontSize = 12.sp, color = EcoGreen)
+                    Text(contact, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                    Text(online, fontSize = 12.sp, color = MaterialTheme.colorScheme.secondary)
                 }
             }
         }
 
         EcoSectionCard {
             messages.forEach { message ->
-                val bubbleColor = if (message.fromMe) EcoGreen else Color(0xFFE8F5E9)
-                val textColor = if (message.fromMe) Color.White else EcoGreenDark
+                val bubbleColor = if (message.fromMe) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.surfaceVariant
+                val textColor = if (message.fromMe) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onSurfaceVariant
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = if (message.fromMe) Arrangement.End else Arrangement.Start,
@@ -144,7 +144,7 @@ fun ChatScreen(onBack: () -> Unit, variant: Int = 1) {
                             .padding(10.dp),
                     ) {
                         Text(message.text, fontSize = 14.sp, color = textColor)
-                        Text(message.time, fontSize = 10.sp, color = if (message.fromMe) Color.White.copy(alpha = 0.7f) else Color.Gray)
+                        Text(message.time, fontSize = 10.sp, color = if (message.fromMe) Color.White.copy(alpha = 0.7f) else MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             }
@@ -177,7 +177,7 @@ fun ChatScreen(onBack: () -> Unit, variant: Int = 1) {
                 shape = RoundedCornerShape(12.dp),
                 colors = androidx.compose.material3.ButtonDefaults.buttonColors(
                     containerColor = Color.White,
-                    contentColor = EcoGreenDark,
+                    contentColor = MaterialTheme.colorScheme.primary,
                 ),
             ) {
                 Text("Enviar", fontWeight = FontWeight.Bold)

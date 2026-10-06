@@ -92,25 +92,25 @@ fun ProductRow(product: ProductItem, onClick: (() -> Unit)? = null) {
             modifier = Modifier
                 .width(48.dp)
                 .height(48.dp)
-                .background(EcoGreen.copy(alpha = 0.2f), RoundedCornerShape(10.dp)),
+                .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f), RoundedCornerShape(10.dp)),
             contentAlignment = Alignment.Center,
         ) {
             Text(product.emoji, fontSize = 24.sp)
         }
         Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) {
-            Text(product.name, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = EcoGreenDark)
+            Text(product.name, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.primary)
             Text(
                 "${product.condition} • ${product.category}",
                 fontSize = 12.sp,
-                color = Color.Gray,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
         Text(
             "$${product.price.let { price -> "$price" }}",
             fontSize = 15.sp,
             fontWeight = FontWeight.Bold,
-            color = EcoGreenDark,
+            color = MaterialTheme.colorScheme.primary,
         )
     }
 }
@@ -161,7 +161,7 @@ fun CatalogScreen(onBack: () -> Unit, onCheckout: () -> Unit) {
                     Text(
                         "Resultados para «$query»: ${filtered.size}",
                         fontSize = 13.sp,
-                        color = EcoGreenDark,
+                        color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Medium,
                     )
                 }
@@ -194,18 +194,18 @@ fun CollectionPointScreen(onBack: () -> Unit, onContinue: () -> Unit) {
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Column(Modifier.weight(1f)) {
-                            Text(point.name, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = EcoGreenDark)
-                            Text(point.address, fontSize = 12.sp, color = Color.Gray)
+                            Text(point.name, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                            Text(point.address, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             Spacer(Modifier.height(4.dp))
                             Text(
                                 "📍 ${point.distanceKm}  ⭐ ${point.rating}",
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Medium,
-                                color = EcoGreen,
+                                color = MaterialTheme.colorScheme.secondary,
                             )
                         }
                         if (isSelected) {
-                            Text("✓", fontSize = 22.sp, color = EcoGreen, fontWeight = FontWeight.Bold)
+                            Text("✓", fontSize = 22.sp, color = MaterialTheme.colorScheme.secondary, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -252,7 +252,7 @@ fun OrderSummaryScreen(onBack: () -> Unit, onContinue: () -> Unit) {
                     "TOTAL  $$total",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = EcoGreenDark,
+                    color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.End,
                 )
@@ -270,8 +270,8 @@ private fun InfoLine(label: String, value: String) {
         modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        Text(label, fontSize = 14.sp, color = Color.Gray)
-        Text(value, fontSize = 14.sp, color = EcoGreenDark, fontWeight = FontWeight.Medium)
+        Text(label, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(value, fontSize = 14.sp, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Medium)
     }
 }
 
