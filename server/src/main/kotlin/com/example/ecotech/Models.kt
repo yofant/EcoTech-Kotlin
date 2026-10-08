@@ -76,6 +76,8 @@ data class EquipoDto(
     val descripcion: String? = null,
     val fechaRecepcion: String? = null,
     val usuarioId: Int? = null,
+    val publicado: Boolean = false,
+    val vendedorNombre: String? = null,
 )
 
 @Serializable
@@ -89,6 +91,7 @@ data class EquipoRequest(
     val estadoActual: String,
     val descripcion: String? = null,
     val usuarioId: Int? = null,
+    val publicado: Boolean? = null,
 )
 
 @Serializable
@@ -203,6 +206,92 @@ data class UpdateUserRequest(
     val email: String? = null,
     val telefono: String? = null,
     val rol: String? = null,
+    val password: String? = null,
+)
+
+@Serializable
+data class CreateAdminUserRequest(
+    val nombre: String,
+    val apellido: String,
+    val email: String,
+    val telefono: String,
+    val rol: String,
+    val password: String,
+)
+
+@Serializable
+data class PuntoRecoleccionDto(
+    val puntoId: Int,
+    val nombre: String,
+    val ciudadId: Int? = null,
+    val ciudad: String? = null,
+    val direccion: String,
+    val horario: String,
+    val instrucciones: String? = null,
+    val activo: Boolean = true,
+)
+
+@Serializable
+data class PuntoRecoleccionRequest(
+    val nombre: String,
+    val ciudadId: Int? = null,
+    val direccion: String,
+    val horario: String,
+    val instrucciones: String? = null,
+)
+
+@Serializable
+data class ContactoDto(val id: Int, val nombre: String)
+
+@Serializable
+data class PortalConversationDto(
+    val conversacionId: Int,
+    val contactoId: Int,
+    val contactoNombre: String,
+    val tipo: String,
+    val equipoId: Int? = null,
+    val equipoMarca: String? = null,
+    val equipoModelo: String? = null,
+    val ultimoMensaje: String? = null,
+    val ultimaFecha: String? = null,
+    val noLeidos: Int = 0,
+)
+
+@Serializable
+data class PortalMessageDto(
+    val mensajeId: Long,
+    val emisorId: Int,
+    val emisorNombre: String,
+    val contenido: String,
+    val fechaEnvio: String,
+)
+
+@Serializable
+data class StartConversationRequest(
+    val tipo: String,
+    val contactoId: Int,
+    val equipoId: Int? = null,
+)
+
+@Serializable
+data class SendMessageRequest(val conversacionId: Int, val contenido: String)
+
+@Serializable
+data class PublicarEquipoRequest(
+    val tipoId: Int,
+    val marca: String,
+    val modelo: String,
+    val serial: String? = null,
+    val descripcion: String? = null,
+)
+
+@Serializable
+data class PortalInitialDto(
+    val tipos: List<TipoEquipoDto>,
+    val equipos: List<EquipoDto>,
+    val puntos: List<PuntoRecoleccionDto>,
+    val operadores: List<ContactoDto>,
+    val conversaciones: List<PortalConversationDto>,
 )
 
 @Serializable
@@ -214,6 +303,8 @@ data class AuditoriaDto(
     val usuarioSql: String? = null,
     val fecha: String? = null,
     val detalle: String? = null,
+    val valoresAnteriores: String? = null,
+    val valoresNuevos: String? = null,
 )
 
 @Serializable

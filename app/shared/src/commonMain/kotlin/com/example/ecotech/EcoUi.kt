@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -37,7 +39,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
@@ -48,14 +53,43 @@ import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun EcoBackground(content: @Composable ColumnScope.() -> Unit) {
-    Column(
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
-            .background(ecoGradient())
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 20.dp, vertical = 24.dp),
-        content = content,
-    )
+            .drawBehind {
+                drawRect(ecoGradient())
+                val leftCenter = Offset(size.width * 0.08f, size.height * 0.02f)
+                drawCircle(
+                    brush = Brush.radialGradient(
+                        colors = listOf(Color(0xFF2EE68A).copy(alpha = 0.10f), Color.Transparent),
+                        center = leftCenter,
+                        radius = size.maxDimension * 0.82f,
+                    ),
+                    radius = size.maxDimension * 0.82f,
+                    center = leftCenter,
+                )
+                val rightCenter = Offset(size.width * 0.96f, size.height * 0.08f)
+                drawCircle(
+                    brush = Brush.radialGradient(
+                        colors = listOf(Color(0xFF12C46E).copy(alpha = 0.07f), Color.Transparent),
+                        center = rightCenter,
+                        radius = size.maxDimension * 0.66f,
+                    ),
+                    radius = size.maxDimension * 0.66f,
+                    center = rightCenter,
+                )
+            },
+    ) {
+        Column(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .widthIn(max = 1180.dp)
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 20.dp, vertical = 24.dp),
+            content = content,
+        )
+    }
 }
 
 @Composable
@@ -83,13 +117,13 @@ fun EcoBackHeader(
         Surface(
             onClick = onBack,
             shape = CircleShape,
-            color = Color(0xFF0A1E12),
-            contentColor = Color(0xFF00E676),
-            border = BorderStroke(1.dp, Color(0xFF1B3825)),
+            color = MaterialTheme.colorScheme.surfaceVariant,
+            contentColor = MaterialTheme.colorScheme.primary,
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
             modifier = Modifier.size(40.dp)
         ) {
             Box(contentAlignment = Alignment.Center) {
-                Text("‹", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color(0xFF00E676))
+                Text("‹", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
             }
         }
 
@@ -99,7 +133,7 @@ fun EcoBackHeader(
             text = title,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.weight(1f),
             textAlign = TextAlign.Start
         )
@@ -116,7 +150,7 @@ fun EcoTitle(text: String, fontSize: Int = 30, topPadding: Int = 4) {
         text = text,
         fontSize = fontSize.sp,
         fontWeight = FontWeight.ExtraBold,
-        color = Color.White,
+        color = MaterialTheme.colorScheme.onBackground,
         modifier = Modifier.padding(top = topPadding.dp, bottom = 4.dp),
         textAlign = TextAlign.Center,
         letterSpacing = (-0.5).sp
@@ -129,10 +163,81 @@ fun EcoSubtitle(text: String) {
         text = text,
         fontSize = 14.sp,
         fontWeight = FontWeight.Medium,
-        color = Color(0xFFA7F3D0),
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
         textAlign = TextAlign.Center,
         lineHeight = 20.sp
     )
+}
+
+@Composable
+fun EcoEyebrow(text: String) {
+    Surface(
+        shape = CircleShape,
+        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.09f),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.16f)),
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+        ) {
+            Box(
+                Modifier
+                    .size(6.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primary),
+            )
+            Spacer(Modifier.width(8.dp))
+            Text(
+                text = text.uppercase(),
+                color = MaterialTheme.colorScheme.tertiary,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.SemiBold,
+                letterSpacing = 1.2.sp,
+            )
+        }
+    }
+}
+
+@Composable
+fun EcoRoleHero(
+    kicker: String,
+    title: String,
+    subtitle: String,
+    icon: String,
+) {
+    EcoSectionCard {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                EcoEyebrow(kicker)
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Spacer(Modifier.width(12.dp))
+            Box(
+                modifier = Modifier
+                    .size(68.dp)
+                    .clip(RoundedCornerShape(22.dp))
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.10f)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(icon, fontSize = 32.sp)
+            }
+        }
+    }
 }
 
 @Composable
@@ -150,13 +255,13 @@ fun EcoPrimaryButton(
         modifier = modifier
             .fillMaxWidth()
             .height(54.dp)
-            .shadow(elevation = 12.dp, shape = RoundedCornerShape(14.dp), spotColor = Color(0xFF00E676)),
-        shape = RoundedCornerShape(14.dp),
+            .shadow(elevation = 8.dp, shape = RoundedCornerShape(12.dp), spotColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)),
+        shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0xFF00E676),
-            contentColor = Color(0xFF000000),
-            disabledContainerColor = Color(0xFF00E676).copy(alpha = 0.4f),
-            disabledContentColor = Color(0xFF000000).copy(alpha = 0.6f)
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+            disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
+            disabledContentColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f),
         ),
     ) {
         Row(
@@ -166,7 +271,7 @@ fun EcoPrimaryButton(
             if (isLoading) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(20.dp),
-                    color = Color(0xFF000000),
+                    color = MaterialTheme.colorScheme.onPrimary,
                     strokeWidth = 2.5.dp
                 )
                 Spacer(Modifier.width(10.dp))
@@ -199,10 +304,10 @@ fun EcoSecondaryButton(
             .height(52.dp),
         shape = RoundedCornerShape(14.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0xFF0A1810),
-            contentColor = Color(0xFF00E676),
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            contentColor = MaterialTheme.colorScheme.primary,
         ),
-        border = BorderStroke(1.5.dp, Color(0xFF1B3825))
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
     ) {
         Text(text = text, fontSize = 15.sp, fontWeight = FontWeight.Bold)
     }
@@ -222,9 +327,9 @@ fun EcoOutlinedButton(
             .fillMaxWidth()
             .height(52.dp),
         shape = RoundedCornerShape(14.dp),
-        border = BorderStroke(1.5.dp, Color(0xFF00E676)),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.65f)),
         colors = ButtonDefaults.outlinedButtonColors(
-            contentColor = Color(0xFF00E676)
+            contentColor = MaterialTheme.colorScheme.primary
         )
     ) {
         Text(text = text, fontSize = 15.sp, fontWeight = FontWeight.Bold)
@@ -237,13 +342,16 @@ fun EcoSectionCard(
     content: @Composable ColumnScope.() -> Unit
 ) {
     Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(18.dp))
+            .background(ecoCardGradient(), RoundedCornerShape(18.dp)),
+        shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF0A140E)
+            containerColor = Color.Transparent,
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-        border = BorderStroke(1.dp, Color(0xFF1B3825))
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.8f))
     ) {
         Column(
             modifier = Modifier.padding(18.dp),
@@ -258,7 +366,7 @@ fun EcoSectionTitle(text: String) {
         text = text,
         fontSize = 18.sp,
         fontWeight = FontWeight.Bold,
-        color = Color(0xFF00E676),
+        color = MaterialTheme.colorScheme.onSurface,
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 4.dp, bottom = 2.dp),
@@ -288,7 +396,7 @@ fun EcoNavItem(
                 modifier = Modifier
                     .size(44.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(Color(0xFF0F2B1B)),
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.11f)),
                 contentAlignment = Alignment.Center
             ) {
                 Text(emoji, fontSize = 20.sp)
@@ -301,14 +409,14 @@ fun EcoNavItem(
                     text = title,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 subtitle?.let {
                     Spacer(Modifier.height(2.dp))
                     Text(
                         text = it,
                         fontSize = 12.sp,
-                        color = Color(0xFFA7F3D0),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         lineHeight = 16.sp
                     )
                 }
@@ -318,14 +426,14 @@ fun EcoNavItem(
                 modifier = Modifier
                     .size(30.dp)
                     .clip(CircleShape)
-                    .background(Color(0xFF0F2B1B)),
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.08f)),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = "›",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF00E676)
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }
@@ -350,8 +458,8 @@ fun EcoCheckboxRow(label: String, checked: Boolean, onClick: () -> Unit) {
                 .size(24.dp)
                 .clip(RoundedCornerShape(6.dp))
                 .background(
-                    if (checked) Color(0xFF00E676)
-                    else Color(0xFF162A1D)
+                    if (checked) MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.surfaceVariant
                 )
                 .padding(2.dp),
             contentAlignment = Alignment.Center,
@@ -360,7 +468,7 @@ fun EcoCheckboxRow(label: String, checked: Boolean, onClick: () -> Unit) {
                 Text(
                     text = "✓",
                     fontSize = 15.sp,
-                    color = Color(0xFF000000),
+                    color = MaterialTheme.colorScheme.onPrimary,
                     fontWeight = FontWeight.ExtraBold
                 )
             }
@@ -370,7 +478,7 @@ fun EcoCheckboxRow(label: String, checked: Boolean, onClick: () -> Unit) {
             text = label,
             fontSize = 15.sp,
             fontWeight = FontWeight.Medium,
-            color = Color.White
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }
@@ -408,18 +516,18 @@ fun EcoOutlinedTextField(
         shape = RoundedCornerShape(14.dp),
         modifier = modifier.fillMaxWidth(),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedTextColor = Color.White,
-            unfocusedTextColor = Color.White,
-            focusedLabelColor = Color(0xFF00E676),
-            unfocusedLabelColor = Color(0xFFA7F3D0).copy(alpha = 0.75f),
-            focusedBorderColor = Color(0xFF00E676),
-            unfocusedBorderColor = Color(0xFF1B3825),
-            focusedContainerColor = Color(0xFF0A1B11),
-            unfocusedContainerColor = Color(0xFF060F0A),
-            errorBorderColor = Color(0xFFFF5252),
-            errorLabelColor = Color(0xFFFF5252),
+            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+            focusedLabelColor = MaterialTheme.colorScheme.primary,
+            unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+            focusedContainerColor = Color(0xFF0B1510),
+            unfocusedContainerColor = Color(0xFF0B1510),
+            errorBorderColor = MaterialTheme.colorScheme.error,
+            errorLabelColor = MaterialTheme.colorScheme.error,
             errorContainerColor = Color(0xFF1A0A0A),
-            cursorColor = Color(0xFF00E676)
+            cursorColor = MaterialTheme.colorScheme.primary
         )
     )
 }
@@ -428,8 +536,8 @@ fun EcoOutlinedTextField(
 @Composable
 fun EcoStatusChip(
     text: String,
-    color: Color = Color(0xFF00E676),
-    contentColor: Color = Color(0xFF000000)
+    color: Color = MaterialTheme.colorScheme.primary,
+    contentColor: Color = MaterialTheme.colorScheme.onPrimary
 ) {
     Box(
         modifier = Modifier
@@ -459,10 +567,10 @@ fun EcoStatCard(
         modifier = modifier,
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF0A140E)
+            containerColor = MaterialTheme.colorScheme.surface
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        border = BorderStroke(1.dp, Color(0xFF1B3825))
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
     ) {
         Row(
             modifier = Modifier.padding(14.dp),
@@ -472,7 +580,7 @@ fun EcoStatCard(
                 modifier = Modifier
                     .size(42.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(Color(0xFF0F2B1B)),
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.11f)),
                 contentAlignment = Alignment.Center
             ) {
                 Text(emoji, fontSize = 20.sp)
@@ -482,20 +590,20 @@ fun EcoStatCard(
                 Text(
                     text = title,
                     fontSize = 12.sp,
-                    color = Color(0xFFA7F3D0),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = FontWeight.Medium
                 )
                 Text(
                     text = value,
                     fontSize = 18.sp,
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold
                 )
                 subtitle?.let {
                     Text(
                         text = it,
                         fontSize = 11.sp,
-                        color = Color(0xFF00E676)
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             }
@@ -509,7 +617,7 @@ private fun EcoUiPreview() {
     EcoTheme {
         Column(
             modifier = Modifier
-                .background(Color(0xFF000000))
+                .background(MaterialTheme.colorScheme.background)
                 .padding(16.dp)
         ) {
             EcoTitle("EcoTech Negro y Verde")

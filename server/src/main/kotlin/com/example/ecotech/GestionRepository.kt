@@ -22,8 +22,11 @@ object GestionRepository {
         fecha = this.getOrNull(Diagnosticos.fecha)?.formatEco(),
     )
 
-    fun diagnosticos(): List<DiagnosticoDto> = transaction {
-        Diagnosticos.selectAll().orderBy(Diagnosticos.diagnosticoId).map { it.toDiagnosticoDto() }
+    fun diagnosticos(tecnicoId: Int? = null): List<DiagnosticoDto> = transaction {
+        val records = if (tecnicoId == null) Diagnosticos.selectAll() else {
+            Diagnosticos.selectAll().where { Diagnosticos.tecnicoId eq tecnicoId }
+        }
+        records.orderBy(Diagnosticos.diagnosticoId).map { it.toDiagnosticoDto() }
     }
 
     fun diagnostico(id: Int): DiagnosticoDto? = transaction {
@@ -39,6 +42,9 @@ object GestionRepository {
             it[costoEstimado] = req.costoEstimado?.toBigDecimal()
             it[fecha] = now()
         } get Diagnosticos.diagnosticoId
+        Equipos.update({ Equipos.equipoId eq req.equipoId }) {
+            it[estadoActual] = if (req.requiereReparacion) "En Reparación" else "Listo para entrega"
+        }
         Audit.record("Diagnosticos", "INSERT", id, "Diagnóstico creado para equipo ${req.equipoId}")
         diagnostico(id)
     }
@@ -52,6 +58,11 @@ object GestionRepository {
             if (req.costoEstimado != null) it[costoEstimado] = req.costoEstimado.toBigDecimal()
         }
         if (updated > 0) Audit.record("Diagnosticos", "UPDATE", id, "Diagnóstico actualizado")
+        if (updated > 0) {
+            Equipos.update({ Equipos.equipoId eq req.equipoId }) {
+                it[estadoActual] = if (req.requiereReparacion) "En Reparación" else "Listo para entrega"
+            }
+        }
         updated > 0
     }
 
@@ -75,8 +86,11 @@ object GestionRepository {
         fechaFin = this.getOrNull(Reparaciones.fechaFin)?.formatEco(),
     )
 
-    fun reparaciones(): List<ReparacionDto> = transaction {
-        Reparaciones.selectAll().orderBy(Reparaciones.reparacionId).map { it.toReparacionDto() }
+    fun reparaciones(tecnicoId: Int? = null): List<ReparacionDto> = transaction {
+        val records = if (tecnicoId == null) Reparaciones.selectAll() else {
+            Reparaciones.selectAll().where { Reparaciones.tecnicoId eq tecnicoId }
+        }
+        records.orderBy(Reparaciones.reparacionId).map { it.toReparacionDto() }
     }
 
     fun reparacion(id: Int): ReparacionDto? = transaction {
@@ -94,6 +108,9 @@ object GestionRepository {
             it[fechaInicio] = now()
             it[fechaFin] = req.fechaFin.toLocalDateTimeOrNull()
         } get Reparaciones.reparacionId
+        Equipos.update({ Equipos.equipoId eq req.equipoId }) {
+            it[estadoActual] = if (req.estado.equals("Completada", ignoreCase = true)) "Reacondicionado" else "En Reparación"
+        }
         Audit.record("Reparaciones", "INSERT", id, "Reparación iniciada")
         reparacion(id)
     }
@@ -109,6 +126,11 @@ object GestionRepository {
             if (req.fechaFin != null) it[fechaFin] = req.fechaFin.toLocalDateTimeOrNull()
         }
         if (updated > 0) Audit.record("Reparaciones", "UPDATE", id, "Reparación actualizada")
+        if (updated > 0 && req.estado != null) {
+            Equipos.update({ Equipos.equipoId eq req.equipoId }) {
+                it[estadoActual] = if (req.estado.equals("Completada", ignoreCase = true)) "Reacondicionado" else "En Reparación"
+            }
+        }
         updated > 0
     }
 

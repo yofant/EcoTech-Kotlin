@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
@@ -36,12 +37,16 @@ fun ForgotPasswordScreen(onBack: () -> Unit, onLogin: () -> Unit) {
     EcoBackground {
         EcoBackHeader(title = "Recuperar Contraseña", onBack = onBack)
 
-        Column(
+        EcoSectionCard(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 16.dp, horizontal = 4.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+                .align(Alignment.CenterHorizontally)
+                .widthIn(max = 480.dp),
         ) {
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp, horizontal = 4.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
             Box(
                 modifier = Modifier
                     .size(80.dp)
@@ -51,9 +56,8 @@ fun ForgotPasswordScreen(onBack: () -> Unit, onLogin: () -> Unit) {
                 Text(text = if (sent) "📨" else "🔑", fontSize = 48.sp)
             }
 
-            Spacer(Modifier.height(16.dp))
-
             EcoTitle(text = if (sent) "¡Correo Enviado!" else "¿Olvidaste tu contraseña?", fontSize = 28)
+            EcoEyebrow(if (sent) "Revisa tu correo" else "Recuperación segura")
             
             Spacer(Modifier.height(8.dp))
 
@@ -63,8 +67,6 @@ fun ForgotPasswordScreen(onBack: () -> Unit, onLogin: () -> Unit) {
                 else
                     "Ingresa tu correo registrado y te enviaremos un enlace de restablecimiento."
             )
-
-            Spacer(Modifier.height(32.dp))
 
             if (sent) {
                 EcoSectionCard {
@@ -122,6 +124,7 @@ fun ForgotPasswordScreen(onBack: () -> Unit, onLogin: () -> Unit) {
                     onClick = onBack
                 )
             }
+        }
         }
     }
 }

@@ -37,7 +37,7 @@ fun HomeScreen(user: UserResponse?, onLogout: () -> Unit) {
                 modifier = Modifier
                     .size(90.dp)
                     .clip(CircleShape)
-                    .background(Color.White.copy(alpha = 0.20f)),
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)),
                 contentAlignment = Alignment.Center
             ) {
                 Text(text = "🌱", fontSize = 52.sp)

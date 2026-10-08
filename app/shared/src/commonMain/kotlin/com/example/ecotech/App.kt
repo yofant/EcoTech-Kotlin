@@ -38,6 +38,7 @@ enum class Screen {
     ConfirmationSuccess,
     ConfirmationDelete,
     ConfirmationDeactivate,
+    RolePortal,
 }
 
 @Composable
@@ -56,14 +57,7 @@ fun App(darkTheme: Boolean? = null) {
             if (backStack.isNotEmpty()) screen = backStack.removeLast()
         }
 
-        fun homeForRole(user: UserResponse?): Screen = when (user?.role?.lowercase()) {
-            "administrador" -> Screen.AdminHome
-            "auditor" -> Screen.AuditorHome
-            "operador" -> Screen.OperatorHome
-            "tecnico" -> Screen.TechnicianHome
-            "vendedor" -> Screen.SellerHome
-            else -> Screen.CustomerHome
-        }
+        fun homeForRole(user: UserResponse?): Screen = Screen.RolePortal
 
         when (screen) {
             Screen.Welcome -> WelcomeScreen(
@@ -91,7 +85,7 @@ fun App(darkTheme: Boolean? = null) {
             )
             Screen.CustomerHome -> CustomerHomeScreen(
                 user = currentUser,
-                onLogout = { currentUser = null; screen = Screen.Login },
+                onLogout = { AuthApi.clearSession(); currentUser = null; screen = Screen.Login },
                 onOpenCatalog = { navigateTo(Screen.Catalog) },
                 onSelectCollectionPoint = { navigateTo(Screen.CollectionPoint) },
                 onCheckout = { navigateTo(Screen.OrderSummary) },
@@ -124,7 +118,7 @@ fun App(darkTheme: Boolean? = null) {
                 onBack = { goBack() },
                 onOpenNotifications = { navigateTo(Screen.Notifications) },
                 onOpenChat = { navigateTo(Screen.Chat) },
-                onLogout = { currentUser = null; screen = Screen.Login },
+                onLogout = { AuthApi.clearSession(); currentUser = null; screen = Screen.Login },
             )
             Screen.Notifications -> NotificationsScreen(
                 onBack = { goBack() },
@@ -136,7 +130,7 @@ fun App(darkTheme: Boolean? = null) {
             )
             Screen.SellerHome -> SellerHomeScreen(
                 user = currentUser,
-                onLogout = { currentUser = null; screen = Screen.Login },
+                onLogout = { AuthApi.clearSession(); currentUser = null; screen = Screen.Login },
                 onOpenSold = { navigateTo(Screen.SoldProducts) },
                 onOpenBought = { navigateTo(Screen.BoughtProducts) },
                 onOpenRecords = { navigateTo(Screen.CustomerRecords) },
@@ -158,7 +152,7 @@ fun App(darkTheme: Boolean? = null) {
             )
             Screen.AdminHome -> AdminHomeScreen(
                 user = currentUser,
-                onLogout = { currentUser = null; screen = Screen.Login },
+                onLogout = { AuthApi.clearSession(); currentUser = null; screen = Screen.Login },
                 onOpenUsers = { navigateTo(Screen.UserList) },
                 onOpenTracking = { navigateTo(Screen.DeliveryTracking) },
                 onOpenStats = { navigateTo(Screen.SellerStats) },
@@ -168,7 +162,7 @@ fun App(darkTheme: Boolean? = null) {
             )
             Screen.AuditorHome -> AuditorHomeScreen(
                 user = currentUser,
-                onLogout = { currentUser = null; screen = Screen.Login },
+                onLogout = { AuthApi.clearSession(); currentUser = null; screen = Screen.Login },
                 onOpenUsers = { navigateTo(Screen.UserList) },
                 onOpenStats = { navigateTo(Screen.SellerStats) },
                 onOpenEvents = { navigateTo(Screen.CollectionEvents) },
@@ -218,6 +212,10 @@ fun App(darkTheme: Boolean? = null) {
             Screen.ConfirmationDeactivate -> ConfirmationScreen(
                 type = ConfirmationType.Deactivate,
                 onDone = { screen = homeForRole(currentUser) },
+            )
+            Screen.RolePortal -> RolePortalScreen(
+                user = currentUser,
+                onLogout = { currentUser = null; screen = Screen.Login },
             )
         }
     }

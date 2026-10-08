@@ -44,12 +44,38 @@ fun CustomerHomeScreen(
     onOpenChat: () -> Unit,
 ) {
     EcoBackground {
-        EcoTitle(text = "♻️ Panel Usuario", fontSize = 30, topPadding = 4)
-        Spacer(Modifier.height(4.dp))
-        EcoSubtitle("¡Hola, ${user?.name ?: "Cliente"}! ¿Qué tecnología reutilizamos hoy?")
-        Spacer(Modifier.height(8.dp))
+        EcoRoleHero(
+            kicker = "Comunidad EcoTech",
+            title = "Hola, ${user?.name ?: "Usuario"}",
+            subtitle = "Encuentra tecnología, conversa con vendedores y coordina tus entregas.",
+            icon = "♻️",
+        )
 
         EcoBody {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                EcoStatCard(
+                    emoji = "💻",
+                    title = "Equipos",
+                    value = "${DemoData.featuredProducts.size}",
+                    modifier = Modifier.weight(1f),
+                )
+                EcoStatCard(
+                    emoji = "📍",
+                    title = "Puntos",
+                    value = "${DemoData.collectionPoints.size}",
+                    modifier = Modifier.weight(1f),
+                )
+                EcoStatCard(
+                    emoji = "💬",
+                    title = "Chats",
+                    value = "1",
+                    modifier = Modifier.weight(1f),
+                )
+            }
+
             EcoSectionTitle("📂 Categorías")
             EcoSectionCard {
                 DemoData.categories.forEach { category ->
@@ -105,7 +131,7 @@ fun ProductRow(product: ProductItem, onClick: (() -> Unit)? = null) {
         }
         Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) {
-            Text(product.name, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.primary)
+            Text(product.name, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
             Text(
                 "${product.condition} • ${product.category}",
                 fontSize = 12.sp,
@@ -137,12 +163,15 @@ fun CatalogScreen(onBack: () -> Unit, onCheckout: () -> Unit) {
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = Color.White,
-                unfocusedTextColor = Color.White,
-                focusedLabelColor = Color.White,
-                unfocusedLabelColor = Color.White.copy(alpha = 0.7f),
-                focusedBorderColor = Color.White,
-                unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+                focusedContainerColor = Color(0xFF0B1510),
+                unfocusedContainerColor = Color(0xFF0B1510),
+                cursorColor = MaterialTheme.colorScheme.primary,
             ),
         )
 

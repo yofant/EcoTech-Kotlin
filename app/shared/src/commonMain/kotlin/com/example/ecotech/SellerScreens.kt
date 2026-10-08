@@ -1,6 +1,7 @@
 package com.example.ecotech
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -35,10 +37,12 @@ fun SellerHomeScreen(
     onOpenNotifications: () -> Unit,
 ) {
     EcoBackground {
-        EcoTitle(text = "🧑‍💼 Panel Vendedor", fontSize = 28, topPadding = 4)
-        Spacer(Modifier.height(4.dp))
-        EcoSubtitle("¡Hola, ${user?.name ?: "Vendedor"}! Gestiona tus equipos y ventas.")
-        Spacer(Modifier.height(8.dp))
+        EcoRoleHero(
+            kicker = "Espacio de trabajo",
+            title = "Hola, ${user?.name ?: "Vendedor"}",
+            subtitle = "Gestiona tus equipos, ventas y conversaciones con clientes.",
+            icon = "🧑‍💼",
+        )
 
         EcoBody {
             EcoSectionTitle("📊 Resumen rápido")
@@ -84,7 +88,9 @@ private fun MetricBox(
         modifier = modifier
             .height(86.dp)
             .padding(horizontal = 4.dp)
-            .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.15f), RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(15.dp))
+            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.07f), RoundedCornerShape(15.dp))
+            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(15.dp))
             .padding(8.dp),
     ) {
         Text(emoji, fontSize = 20.sp)

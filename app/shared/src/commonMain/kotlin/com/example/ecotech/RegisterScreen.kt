@@ -4,11 +4,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.DropdownMenuItem
@@ -17,6 +17,7 @@ import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -28,7 +29,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.launch
 
-private val roles = listOf("Usuario", "Vendedor", "Auditor", "Operador", "Tecnico", "Administrador")
+private val roles = listOf("Usuario", "Vendedor")
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -94,13 +94,16 @@ fun RegisterScreen(onBackToLogin: () -> Unit, onRegisterSuccess: (UserResponse) 
     EcoBackground {
         EcoBackHeader(title = "Crear Cuenta", onBack = onBackToLogin)
 
-        Column(
+        EcoSectionCard(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(vertical = 8.dp, horizontal = 4.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
+                .align(Alignment.CenterHorizontally)
+                .widthIn(max = 560.dp),
         ) {
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
             Box(
                 modifier = Modifier
                     .size(64.dp)
@@ -114,6 +117,7 @@ fun RegisterScreen(onBackToLogin: () -> Unit, onRegisterSuccess: (UserResponse) 
 
             EcoTitle(text = "Únete a EcoTech", fontSize = 30)
             EcoSubtitle(text = "Crea tu cuenta para comenzar a reciclar y gestionar equipos")
+            EcoEyebrow("Únete a la comunidad")
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -249,7 +253,7 @@ fun RegisterScreen(onBackToLogin: () -> Unit, onRegisterSuccess: (UserResponse) 
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 isError = errorMessage != null,
                 supportingText = errorMessage?.let {
-                    { Text(it, color = Color(0xFFFBBF24), fontWeight = FontWeight.Bold, fontSize = 12.sp) }
+                    { Text(it, color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Bold, fontSize = 12.sp) }
                 },
                 enabled = !isLoading,
             )
@@ -269,16 +273,17 @@ fun RegisterScreen(onBackToLogin: () -> Unit, onRegisterSuccess: (UserResponse) 
             TextButton(onClick = onBackToLogin) {
                 Text(
                     text = "¿Ya tienes cuenta? ",
-                    color = Color.White.copy(alpha = 0.85f),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 14.sp
                 )
                 Text(
                     text = "Inicia sesión",
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp
                 )
             }
+        }
         }
     }
 }

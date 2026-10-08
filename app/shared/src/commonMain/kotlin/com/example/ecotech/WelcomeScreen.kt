@@ -13,16 +13,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -49,7 +45,7 @@ fun WelcomeScreen(onContinue: () -> Unit) {
                     modifier = Modifier
                         .size(110.dp)
                         .clip(CircleShape)
-                        .background(Color.White.copy(alpha = 0.18f)),
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(text = "♻️", fontSize = 64.sp)
@@ -57,6 +53,7 @@ fun WelcomeScreen(onContinue: () -> Unit) {
 
                 Spacer(modifier = Modifier.height(20.dp))
 
+                EcoEyebrow("Tecnología con segunda vida")
                 EcoTitle(text = "EcoTech", fontSize = 42)
                 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -67,19 +64,10 @@ fun WelcomeScreen(onContinue: () -> Unit) {
             }
 
             // Feature Highlights Card
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color.White.copy(alpha = 0.12f)
-                )
-            ) {
-                Column(
-                    modifier = Modifier.padding(20.dp),
-                    verticalArrangement = Arrangement.spacedBy(14.dp)
-                ) {
+            EcoSectionCard {
+                Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
                     FeatureRow(emoji = "🌱", title = "Reciclaje tecnológico", desc = "Dale una segunda vida a tus componentes")
-                    FeatureRow(emoji = "🎁", title = "Beneficios y puntos", desc = "Gana incentivos por cada dispositivo recilado")
+                    FeatureRow(emoji = "🎁", title = "Beneficios y puntos", desc = "Gana incentivos por cada dispositivo reciclado")
                     FeatureRow(emoji = "🚚", title = "Puntos de entrega", desc = "Encuentra el centro de recolección más cercano")
                 }
             }
@@ -103,15 +91,15 @@ private fun FeatureRow(emoji: String, title: String, desc: String) {
             modifier = Modifier
                 .size(38.dp)
                 .clip(CircleShape)
-                .background(Color.White.copy(alpha = 0.20f)),
+                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)),
             contentAlignment = Alignment.Center
         ) {
             Text(emoji, fontSize = 18.sp)
         }
         Spacer(Modifier.width(14.dp))
         Column {
-            Text(title, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.White)
-            Text(desc, fontSize = 12.sp, color = Color.White.copy(alpha = 0.85f))
+            Text(title, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+            Text(desc, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }

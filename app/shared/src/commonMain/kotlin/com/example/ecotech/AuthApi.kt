@@ -5,8 +5,10 @@ import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.request.header
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
@@ -20,6 +22,8 @@ object AuthApi {
      * - Desktop / Otros: http://localhost:8080/api/auth
      */
     var customBaseUrl: String? = null
+    var currentToken: String? = null
+        private set
 
     val baseUrl: String
         get() = customBaseUrl ?: if (getPlatform().name.startsWith("Android")) {
@@ -80,9 +84,20 @@ object AuthApi {
         }
     }
 
+    suspend fun logout() {
+        val token = currentToken ?: return
+        val response = client.post("$baseUrl/logout") {
+            header(HttpHeaders.Authorization, "Bearer $token")
+        }
+        check(response.status.isSuccess()) { "El servidor no pudo revocar la sesión." }
+        clearSession()
+    }
+
     private suspend fun handleResponse(response: HttpResponse): AuthResult {
         return if (response.status.isSuccess()) {
-            AuthResult.success(response.body<AuthResponse>())
+            val auth = response.body<AuthResponse>()
+            currentToken = auth.token
+            AuthResult.success(auth)
         } else {
             val errorBody = try {
                 response.body<ErrorResponse>()
@@ -91,5 +106,9 @@ object AuthApi {
             }
             AuthResult.failure(errorBody.error)
         }
+    }
+
+    fun clearSession() {
+        currentToken = null
     }
 }

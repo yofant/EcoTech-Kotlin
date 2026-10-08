@@ -19,7 +19,7 @@ object DatabaseFactory {
         private set
 
     fun init(throwOnError: Boolean = false) {
-        val host = System.getenv("DB_HOST") ?: System.getProperty("DB_HOST") ?: "98.93.249.61"
+        val host = System.getenv("DB_HOST") ?: System.getProperty("DB_HOST") ?: "52.91.39.2"
         val port = System.getenv("DB_PORT") ?: System.getProperty("DB_PORT") ?: "3306"
         val databaseName = System.getenv("DB_NAME") ?: System.getProperty("DB_NAME") ?: "ecotech"
         val user = System.getenv("DB_USER") ?: System.getProperty("DB_USER") ?: "admin"
@@ -60,6 +60,10 @@ object DatabaseFactory {
                     Reparaciones,
                     Entregas,
                     Auditorias,
+                    AuthSessions,
+                    Conversaciones,
+                    Mensajes,
+                    PuntosRecoleccion,
                 )
             }
 
@@ -199,6 +203,7 @@ object Equipos : Table("Equipos") {
     val descripcion = varchar("descripcion", 200).nullable()
     val fechaRecepcion = datetime("fecha_recepcion")
     val usuarioId = integer("usuario_id").references(Usuarios.id).nullable()
+    val publicado = bool("publicado").default(false)
 
     override val primaryKey = PrimaryKey(equipoId)
 }
@@ -244,13 +249,61 @@ object Entregas : Table("Entregas") {
 object Auditorias : Table("Auditoria") {
     val auditoriaId = integer("auditoria_id").autoIncrement()
     val tablaAfectada = varchar("tabla_afectada", 100)
-    val operacion = varchar("operacion", 15)
+    val operacion = varchar("operacion", 50)
     val registroId = integer("registro_id").nullable()
     val usuarioSql = varchar("usuario_sql", 100).nullable()
     val fecha = datetime("fecha")
-    val detalle = varchar("detalle", 100).nullable()
+    val detalle = text("detalle").nullable()
+    val valoresAnteriores = text("valores_anteriores").nullable()
+    val valoresNuevos = text("valores_nuevos").nullable()
 
     override val primaryKey = PrimaryKey(auditoriaId)
+}
+
+object AuthSessions : Table("AppSessions") {
+    val sessionId = integer("session_id").autoIncrement()
+    val usuarioId = integer("usuario_id").references(Usuarios.id).index()
+    val tokenHash = varchar("token_hash", 64).uniqueIndex()
+    val expiresAt = datetime("expires_at")
+
+    override val primaryKey = PrimaryKey(sessionId)
+}
+
+object Conversaciones : Table("Conversaciones") {
+    val conversacionId = integer("conversacion_id").autoIncrement()
+    val usuarioId = integer("usuario_id").references(Usuarios.id)
+    val interlocutorId = integer("interlocutor_id").references(Usuarios.id)
+    val tipo = varchar("tipo", 20)
+    val equipoId = integer("equipo_id").references(Equipos.equipoId).nullable()
+    val equipoContexto = integer("equipo_contexto").default(0)
+    val fechaCreacion = datetime("fecha_creacion")
+    val fechaActualizacion = datetime("fecha_actualizacion")
+
+    override val primaryKey = PrimaryKey(conversacionId)
+}
+
+object Mensajes : Table("Mensajes") {
+    val mensajeId = long("mensaje_id").autoIncrement()
+    val conversacionId = integer("conversacion_id").references(Conversaciones.conversacionId)
+    val emisorId = integer("emisor_id").references(Usuarios.id)
+    val contenido = text("contenido")
+    val leido = bool("leido").default(false)
+    val fechaEnvio = datetime("fecha_envio")
+
+    override val primaryKey = PrimaryKey(mensajeId)
+}
+
+object PuntosRecoleccion : Table("PuntosRecoleccion") {
+    val puntoId = integer("punto_id").autoIncrement()
+    val nombre = varchar("nombre", 120)
+    val ciudadId = integer("ciudad_id").references(Ciudades.ciudadId).nullable()
+    val direccion = varchar("direccion", 250)
+    val horario = varchar("horario", 150)
+    val instrucciones = varchar("instrucciones", 250).nullable()
+    val activo = bool("activo").default(true)
+    val fechaCreacion = datetime("fecha_creacion")
+
+    override val primaryKey = PrimaryKey(puntoId)
 }
 
 fun now() = LocalDateTime.now()

@@ -42,6 +42,8 @@ private fun ResultRow.toAuditoriaDto() = AuditoriaDto(
     usuarioSql = this.getOrNull(Auditorias.usuarioSql),
     fecha = this.getOrNull(Auditorias.fecha)?.formatEco(),
     detalle = this.getOrNull(Auditorias.detalle),
+    valoresAnteriores = this.getOrNull(Auditorias.valoresAnteriores),
+    valoresNuevos = this.getOrNull(Auditorias.valoresNuevos),
 )
 
 object StatsRepository {

@@ -22,7 +22,11 @@ object EquipoRepository {
         fechaRegistro = this.getOrNull(Donantes.fechaRegistro)?.formatEco(),
     )
 
-    private fun ResultRow.toEquipoDto(tipos: Map<Int, String>, donantes: Map<Int, String>) = EquipoDto(
+    private fun ResultRow.toEquipoDto(
+        tipos: Map<Int, String>,
+        donantes: Map<Int, String>,
+        vendedores: Map<Int, String>,
+    ) = EquipoDto(
         equipoId = this[Equipos.equipoId],
         tipoId = this[Equipos.tipoId],
         tipoNombre = tipos[this[Equipos.tipoId]],
@@ -36,6 +40,8 @@ object EquipoRepository {
         descripcion = this.getOrNull(Equipos.descripcion),
         fechaRecepcion = this.getOrNull(Equipos.fechaRecepcion)?.formatEco(),
         usuarioId = this.getOrNull(Equipos.usuarioId),
+        publicado = this[Equipos.publicado],
+        vendedorNombre = this.getOrNull(Equipos.usuarioId)?.let { vendedores[it] },
     )
 
     // ---- Donantes ----
@@ -88,13 +94,19 @@ object EquipoRepository {
     fun equipos(): List<EquipoDto> = transaction {
         val tipos = TiposEquipo.selectAll().associate { it[TiposEquipo.tipoId] to it[TiposEquipo.nombre] }
         val donantes = Donantes.selectAll().associate { it[Donantes.donanteId] to it[Donantes.nombre] }
-        Equipos.selectAll().orderBy(Equipos.equipoId).map { it.toEquipoDto(tipos, donantes) }
+        val vendedores = Usuarios.selectAll().associate {
+            it[Usuarios.id] to "${it[Usuarios.name]} ${it[Usuarios.lastName]}".trim()
+        }
+        Equipos.selectAll().orderBy(Equipos.equipoId).map { it.toEquipoDto(tipos, donantes, vendedores) }
     }
 
     fun equipo(id: Int): EquipoDto? = transaction {
         val tipos = TiposEquipo.selectAll().associate { it[TiposEquipo.tipoId] to it[TiposEquipo.nombre] }
         val donantes = Donantes.selectAll().associate { it[Donantes.donanteId] to it[Donantes.nombre] }
-        Equipos.selectAll().where { Equipos.equipoId eq id }.singleOrNull()?.toEquipoDto(tipos, donantes)
+        val vendedores = Usuarios.selectAll().associate {
+            it[Usuarios.id] to "${it[Usuarios.name]} ${it[Usuarios.lastName]}".trim()
+        }
+        Equipos.selectAll().where { Equipos.equipoId eq id }.singleOrNull()?.toEquipoDto(tipos, donantes, vendedores)
     }
 
     fun createEquipo(req: EquipoRequest): EquipoDto? = transaction {
@@ -109,6 +121,7 @@ object EquipoRepository {
             it[descripcion] = req.descripcion
             it[fechaRecepcion] = now()
             it[usuarioId] = req.usuarioId
+            it[publicado] = req.publicado ?: false
         } get Equipos.equipoId
         Audit.record("Equipos", "INSERT", id, "Equipo recibido: ${req.modelo ?: req.marca ?: "sin referencia"}")
         equipo(id)
@@ -125,6 +138,7 @@ object EquipoRepository {
             it[estadoActual] = req.estadoActual
             if (req.descripcion != null) it[descripcion] = req.descripcion
             if (req.usuarioId != null) it[usuarioId] = req.usuarioId
+            if (req.publicado != null) it[publicado] = req.publicado
         }
         if (updated > 0) Audit.record("Equipos", "UPDATE", id, "Equipo actualizado")
         updated > 0

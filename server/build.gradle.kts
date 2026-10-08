@@ -24,6 +24,7 @@ dependencies {
     implementation(libs.exposed.javaTime)
     implementation(libs.hikaricp)
     implementation(libs.mysql.connector)
+    implementation("org.mindrot:jbcrypt:0.4")
     testImplementation(libs.ktor.serverTestHost)
     testImplementation(libs.kotlin.testJunit)
 }

@@ -55,7 +55,7 @@ fun ProfileScreen(
                     }
                     Spacer(Modifier.width(14.dp))
                     Column {
-                        Text("${user?.name} ${user?.lastName}", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                        Text("${user?.name} ${user?.lastName}", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                         Text(user?.email ?: "", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Text(user?.phone ?: "", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Text("Rol: ${user?.role ?: "Cliente"}", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.secondary)
@@ -90,7 +90,7 @@ fun NotificationsScreen(onBack: () -> Unit, onOpenChat: () -> Unit) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text("🔔", fontSize = 18.sp)
                             Spacer(Modifier.width(10.dp))
-                            Text(notification.title, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                            Text(notification.title, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                             Spacer(Modifier.weight(1f))
                             Text(notification.time, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
@@ -144,7 +144,7 @@ fun ChatScreen(onBack: () -> Unit, variant: Int = 1) {
                             .padding(10.dp),
                     ) {
                         Text(message.text, fontSize = 14.sp, color = textColor)
-                        Text(message.time, fontSize = 10.sp, color = if (message.fromMe) Color.White.copy(alpha = 0.7f) else MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(message.time, fontSize = 10.sp, color = if (message.fromMe) MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f) else MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             }
@@ -158,12 +158,15 @@ fun ChatScreen(onBack: () -> Unit, variant: Int = 1) {
                 singleLine = true,
                 modifier = Modifier.weight(1f),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = Color.White,
-                    unfocusedTextColor = Color.White,
-                    focusedPlaceholderColor = Color.White.copy(alpha = 0.7f),
-                    unfocusedPlaceholderColor = Color.White.copy(alpha = 0.7f),
-                    focusedBorderColor = Color.White,
-                    unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
+                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+                    focusedContainerColor = Color(0xFF0B1510),
+                    unfocusedContainerColor = Color(0xFF0B1510),
+                    cursorColor = MaterialTheme.colorScheme.primary,
                 ),
             )
             Spacer(Modifier.width(8.dp))
@@ -176,8 +179,8 @@ fun ChatScreen(onBack: () -> Unit, variant: Int = 1) {
                 },
                 shape = RoundedCornerShape(12.dp),
                 colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                    containerColor = Color.White,
-                    contentColor = MaterialTheme.colorScheme.primary,
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
                 ),
             ) {
                 Text("Enviar", fontWeight = FontWeight.Bold)

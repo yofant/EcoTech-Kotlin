@@ -1,6 +1,7 @@
 package com.example.ecotech
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,10 +41,12 @@ fun AdminHomeScreen(
     onOpenNotifications: () -> Unit,
 ) {
     EcoBackground {
-        EcoTitle(text = "🛡️ Panel Administrador", fontSize = 26, topPadding = 4)
-        Spacer(Modifier.height(4.dp))
-        EcoSubtitle("¡Hola, ${user?.name ?: "Administrador"}! Controla plataforma, usuarios y recolecciones.")
-        Spacer(Modifier.height(8.dp))
+        EcoRoleHero(
+            kicker = "Centro de control EcoTech",
+            title = "Hola, ${user?.name ?: "Administrador"}",
+            subtitle = "Administra usuarios, entregas y actividad desde un solo lugar.",
+            icon = "🛡️",
+        )
 
         EcoBody {
             EcoSectionTitle("🌍 Indicadores generales")
@@ -82,7 +86,9 @@ private fun AdminMetric(
         modifier = modifier
             .height(96.dp)
             .padding(horizontal = 4.dp)
-            .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.15f), RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(15.dp))
+            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.07f), RoundedCornerShape(15.dp))
+            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(15.dp))
             .padding(8.dp),
     ) {
         Text(emoji, fontSize = 20.sp)
@@ -249,10 +255,12 @@ fun AuditorHomeScreen(
     onOpenEvents: () -> Unit,
 ) {
     EcoBackground {
-        EcoTitle(text = "🔎 Panel Auditor", fontSize = 26, topPadding = 4)
-        Spacer(Modifier.height(4.dp))
-        EcoSubtitle("¡Hola, ${user?.name ?: "Auditor"}! Revisa la actividad y los registros de EcoTech.")
-        Spacer(Modifier.height(8.dp))
+        EcoRoleHero(
+            kicker = "Vista de consulta",
+            title = "Hola, ${user?.name ?: "Auditor"}",
+            subtitle = "Revisa registros, indicadores y eventos de la plataforma.",
+            icon = "🔎",
+        )
 
         EcoBody {
             EcoSectionTitle("📋 Resumen de auditoría")
@@ -286,10 +294,12 @@ fun OperatorHomeScreen(
     onOpenNotifications: () -> Unit,
 ) {
     EcoBackground {
-        EcoTitle(text = "📦 Panel Operador", fontSize = 26, topPadding = 4)
-        Spacer(Modifier.height(4.dp))
-        EcoSubtitle("¡Hola, ${user?.name ?: "Operador"}! Coordina entregas y puntos de recolección.")
-        Spacer(Modifier.height(8.dp))
+        EcoRoleHero(
+            kicker = "Centro de recogidas",
+            title = "Hola, ${user?.name ?: "Operador"}",
+            subtitle = "Responde solicitudes y coordina entregas de equipos.",
+            icon = "📦",
+        )
 
         EcoBody {
             EcoSectionTitle("🚚 Operación de hoy")
@@ -323,10 +333,12 @@ fun TechnicianHomeScreen(
     onOpenNotifications: () -> Unit,
 ) {
     EcoBackground {
-        EcoTitle(text = "🛠️ Panel Técnico", fontSize = 26, topPadding = 4)
-        Spacer(Modifier.height(4.dp))
-        EcoSubtitle("¡Hola, ${user?.name ?: "Técnico"}! Inspecciona y registra el estado de los equipos.")
-        Spacer(Modifier.height(8.dp))
+        EcoRoleHero(
+            kicker = "Centro técnico",
+            title = "Hola, ${user?.name ?: "Técnico"}",
+            subtitle = "Inspecciona y registra el estado de los equipos asignados.",
+            icon = "🛠️",
+        )
 
         EcoBody {
             EcoSectionTitle("🔧 Trabajo técnico")
