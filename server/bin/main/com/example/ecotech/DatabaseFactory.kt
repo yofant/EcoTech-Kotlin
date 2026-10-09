@@ -11,7 +11,7 @@ import org.jetbrains.exposed.sql.javatime.datetime
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.LocalDateTime
-./gradlew :server:run
+
 object DatabaseFactory {
 
     @Volatile
