@@ -11,7 +11,7 @@ import org.jetbrains.exposed.sql.javatime.datetime
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.LocalDateTime
-
+./gradlew :server:run
 object DatabaseFactory {
 
     @Volatile
@@ -19,7 +19,7 @@ object DatabaseFactory {
         private set
 
     fun init(throwOnError: Boolean = false) {
-        val host = System.getenv("DB_HOST") ?: System.getProperty("DB_HOST") ?: "52.91.39.2"
+        val host = System.getenv("DB_HOST") ?: System.getProperty("DB_HOST") ?: "54.242.212.118"
         val port = System.getenv("DB_PORT") ?: System.getProperty("DB_PORT") ?: "3306"
         val databaseName = System.getenv("DB_NAME") ?: System.getProperty("DB_NAME") ?: "ecotech"
         val user = System.getenv("DB_USER") ?: System.getProperty("DB_USER") ?: "admin"
